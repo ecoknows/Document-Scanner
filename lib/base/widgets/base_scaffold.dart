@@ -1,10 +1,13 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:document_scanner/base/widgets/base_appbar.dart';
+import 'package:document_scanner/common/widgets/authenticated_appbar.dart';
 import 'package:document_scanner/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:document_scanner/features/auth/presentation/screens/sign_in_screen.dart';
-import 'package:document_scanner/features/camera/presentation/screens/camera_screen.dart';
-import 'package:document_scanner/features/files/presentation/screens/files_screen.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/upload_scanned_documents_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/screens/documents_screen.dart';
 import 'package:document_scanner/features/home/presentation/screens/home_screen.dart';
+import 'package:document_scanner/features/notifications/presentation/screens/notification_screen.dart';
 import 'package:document_scanner/features/profile/presentation/screens/profile_screen.dart';
 import 'package:document_scanner/features/settings/presentation/screens/settings_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,26 +18,21 @@ import 'package:go_router/go_router.dart';
 class BaseScaffold extends StatelessWidget {
   final Widget body;
   final FloatingActionButton? floatingActionButton;
-  final Text? appBarTitle;
-  final List<Widget>? appBarActions;
   final Widget? bottomNavigationBar;
+  final PreferredSizeWidget? appBar;
 
   const BaseScaffold({
     super.key,
     required this.body,
     this.floatingActionButton,
-    this.appBarTitle,
-    this.appBarActions,
     this.bottomNavigationBar,
+    this.appBar,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: BaseAppBar(
-        title: appBarTitle,
-        actions: appBarActions,
-      ),
+      appBar: appBar,
       body: body,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: floatingActionButton,
@@ -62,9 +60,7 @@ class _BaseScaffoldDocumentScannerState
 
   final iconList = <IconData>[
     Icons.home,
-    Icons.file_copy_sharp,
-    Icons.settings,
-    Icons.person,
+    Icons.notifications,
   ];
   String appBarTitle = HomeScreen.name;
 
@@ -77,13 +73,19 @@ class _BaseScaffoldDocumentScannerState
 
   @override
   Widget build(BuildContext context) {
-    User? currentUser = FirebaseAuth.instance.currentUser;
-    String? photoUrl = currentUser?.photoURL;
-
     return BaseScaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.pushNamed(CameraScreen.name);
+        onPressed: () async {
+          List<String> pictures;
+          try {
+            pictures = await CunningDocumentScanner.getPictures() ?? [];
+            if (!mounted) return;
+            context.read<UploadScannedDocumentsBloc>().add(
+                  UploadScannedDocumentsStarted(pictures: pictures),
+                );
+          } catch (exception) {
+            // Handle exception here
+          }
         },
         backgroundColor: Colors.orange,
         shape: const CircleBorder(),
@@ -96,7 +98,7 @@ class _BaseScaffoldDocumentScannerState
         icons: iconList,
         activeIndex: _bottomNavIndex,
         gapLocation: GapLocation.center,
-        notchSmoothness: NotchSmoothness.verySmoothEdge,
+        notchSmoothness: NotchSmoothness.defaultEdge,
         leftCornerRadius: 32,
         rightCornerRadius: 32,
         onTap: (index) {
@@ -107,16 +109,8 @@ class _BaseScaffoldDocumentScannerState
               name = HomeScreen.name;
               break;
             case 1:
-              context.goNamed(FilesScreen.name);
-              name = FilesScreen.name;
-              break;
-            case 2:
-              context.goNamed(SettingsScreen.name);
-              name = SettingsScreen.name;
-              break;
-            case 3:
-              context.goNamed(ProfileScreen.name);
-              name = ProfileScreen.name;
+              context.goNamed(NotificationScreen.name);
+              name = NotificationScreen.name;
               break;
           }
           setState(() {
@@ -128,112 +122,9 @@ class _BaseScaffoldDocumentScannerState
         inactiveColor: Colors.white,
         activeColor: Colors.orange,
       ),
-      appBarTitle: Text(appBarTitle),
-      appBarActions: [
-        if (currentUser != null && photoUrl != null)
-          PopupMenuButton(
-            position: PopupMenuPosition.under,
-            constraints: BoxConstraints(
-              minWidth: 132,
-              maxWidth: MediaQuery.of(context).size.width,
-            ),
-            tooltip: 'Menu',
-            surfaceTintColor: Colors.white,
-            color: Colors.white,
-            icon: Row(
-              children: [
-                Center(
-                  child: CircleAvatar(
-                    backgroundColor: Colors.transparent,
-                    backgroundImage: NetworkImage(photoUrl),
-                    radius: 15.0,
-                  ),
-                ),
-                const Icon(
-                  Icons.keyboard_arrow_down,
-                  size: 16.0,
-                ),
-              ],
-            ),
-            onSelected: (value) {
-              switch (value) {
-                case "logout":
-                  context.read<AuthBloc>().add(SignOutUserStarted());
-                  context.goNamed(SignInScreen.name);
-                  break;
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-              const PopupMenuItem(
-                value: "my-profile",
-                height: 0,
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Text('My Profile',
-                    style: TextStyle(
-                        fontFamily: 'OpenSauceTwo',
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                        fontSize: 14)),
-              ),
-              const PopupMenuItem(
-                value: "documents",
-                height: 0,
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Text(
-                  'Documents',
-                  style: TextStyle(
-                    fontFamily: 'OpenSauceTwo',
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              const PopupMenuDivider(),
-              const PopupMenuItem(
-                value: "settings",
-                height: 0,
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Text(
-                  'Settings',
-                  style: TextStyle(
-                    fontFamily: 'OpenSauceTwo',
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              const PopupMenuDivider(),
-              const PopupMenuItem(
-                value: "logout",
-                height: 0,
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: Text(
-                  'Logout',
-                  style: TextStyle(
-                    fontFamily: 'OpenSauceTwo',
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ],
-          )
-      ],
+      appBar: AuthenticatedAppBar(
+        title: appBarTitle,
+      ),
       body: widget.child,
     );
   }

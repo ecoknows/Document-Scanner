@@ -1,5 +1,7 @@
 import 'package:document_scanner/app.dart';
 import 'package:document_scanner/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/upload_scanned_documents_bloc.dart';
 import 'package:document_scanner/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,8 @@ class Main extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => AuthBloc()),
+        BlocProvider(create: (_) => GetScannedDocumentsBloc()),
+        BlocProvider(create: (_) => UploadScannedDocumentsBloc()),
       ],
       child: const App(),
     );

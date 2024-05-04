@@ -1,3 +1,5 @@
+import 'package:document_scanner/base/widgets/base_scaffold.dart';
+import 'package:document_scanner/common/widgets/authenticated_appbar.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -12,6 +14,11 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return BaseScaffold(
+      appBar: AuthenticatedAppBar(
+        title: SettingsScreen.name,
+      ),
+      body: Container(),
+    );
   }
 }

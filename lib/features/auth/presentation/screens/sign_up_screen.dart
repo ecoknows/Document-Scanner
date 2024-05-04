@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import 'package:animated_snack_bar/animated_snack_bar.dart';
+import 'package:document_scanner/base/widgets/base_appbar.dart';
 import 'package:document_scanner/base/widgets/base_scaffold.dart';
 import 'package:document_scanner/base/widgets/base_text_button.dart';
 import 'package:document_scanner/base/widgets/base_textfield.dart';
 import 'package:document_scanner/features/auth/core/exceptions/auth_execptions.dart';
 import 'package:document_scanner/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:document_scanner/features/auth/presentation/screens/sign_in_screen.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/home/presentation/screens/home_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/gestures.dart';
@@ -89,6 +91,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
             mobileSnackBarPosition: MobileSnackBarPosition.bottom,
           ).show(context);
 
+          context
+              .read<GetScannedDocumentsBloc>()
+              .add(GetScannedDocumentsStarted());
+
           context.goNamed(HomeScreen.name);
         } else if (authState is AuthFail) {
           AuthException e = authState.exception;
@@ -102,7 +108,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         }
       },
       child: BaseScaffold(
-        appBarTitle: Text(SignUpScreen.name),
+        appBar: BaseAppBar(
+          title: Text(SignInScreen.name),
+        ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: SingleChildScrollView(

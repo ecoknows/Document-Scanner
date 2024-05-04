@@ -1,3 +1,5 @@
+import 'package:document_scanner/base/widgets/base_scaffold.dart';
+import 'package:document_scanner/common/widgets/authenticated_appbar.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -12,6 +14,11 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return BaseScaffold(
+      appBar: AuthenticatedAppBar(
+        title: ProfileScreen.name,
+      ),
+      body: Container(),
+    );
   }
 }
