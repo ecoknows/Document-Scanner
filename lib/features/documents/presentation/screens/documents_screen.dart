@@ -84,8 +84,27 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               ],
             );
           }
-
-          return Container();
+          return Center(
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 100.0,
+                ),
+                const Icon(
+                  Icons.document_scanner,
+                  color: Colors.black,
+                  size: 100.0,
+                ),
+                const SizedBox(
+                  height: 16.0,
+                ),
+                Text(
+                  "No documents found",
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          );
         },
       ),
     );

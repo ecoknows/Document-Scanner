@@ -1,7 +1,7 @@
 name: "document_scanner"
 description: "Document Scanner"
 publish_to: 'none'
-version: 0.1.1
+version: 0.2.0
 
 environment:
   sdk: '>=3.3.3 <4.0.0'
@@ -11,6 +11,7 @@ dependencies:
   animated_snack_bar: ^0.4.0
   bloc: ^8.1.4
   camera: ^0.10.5+9
+  carousel_slider: ^4.2.1
   cloud_firestore: ^4.16.0
   cunning_document_scanner: ^1.2.2
   equatable: ^2.0.5
@@ -28,8 +29,11 @@ dependencies:
   google_fonts: ^6.2.1
   hive: ^2.2.3
   image_preview: ^1.0.7
+  open_file: ^3.3.2
   path: ^1.9.0
   path_provider: ^2.1.2
+  syncfusion_flutter_pdf: ^25.1.42
+  youtube_player_flutter: ^9.0.1
 
 dev_dependencies:
   flutter_test:
