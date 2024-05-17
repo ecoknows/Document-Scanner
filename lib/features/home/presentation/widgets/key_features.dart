@@ -19,7 +19,8 @@ class KeyFeatures extends StatelessWidget {
                 child: Card(
                   surfaceTintColor: Colors.white,
                   elevation: 3,
-                  child: Padding(
+                  child: Container(
+                    height: 120,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 6.0, vertical: 8.0),
                     child: Column(
@@ -47,7 +48,8 @@ class KeyFeatures extends StatelessWidget {
                 child: Card(
                   surfaceTintColor: Colors.white,
                   elevation: 3,
-                  child: Padding(
+                  child: Container(
+                    height: 120,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 6.0, vertical: 8.0),
                     child: Column(
@@ -75,7 +77,8 @@ class KeyFeatures extends StatelessWidget {
                 child: Card(
                   surfaceTintColor: Colors.white,
                   elevation: 3,
-                  child: Padding(
+                  child: Container(
+                    height: 120,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 6.0, vertical: 8.0),
                     child: Column(
@@ -109,7 +112,8 @@ class KeyFeatures extends StatelessWidget {
                 child: Card(
                   surfaceTintColor: Colors.white,
                   elevation: 3,
-                  child: Padding(
+                  child: Container(
+                    height: 120,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 6.0, vertical: 8.0),
                     child: Column(
@@ -137,7 +141,8 @@ class KeyFeatures extends StatelessWidget {
                 child: Card(
                   surfaceTintColor: Colors.white,
                   elevation: 3,
-                  child: Padding(
+                  child: Container(
+                    height: 120,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 6.0, vertical: 8.0),
                     child: Column(
@@ -165,7 +170,8 @@ class KeyFeatures extends StatelessWidget {
                 child: Card(
                   surfaceTintColor: Colors.white,
                   elevation: 3,
-                  child: Padding(
+                  child: Container(
+                    height: 120,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 6.0, vertical: 8.0),
                     child: Column(

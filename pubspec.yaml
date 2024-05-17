@@ -28,6 +28,7 @@ dependencies:
   go_router: ^13.2.2
   google_fonts: ^6.2.1
   hive: ^2.2.3
+  image_gallery_saver: ^2.0.3
   image_preview: ^1.0.7
   open_file: ^3.3.2
   path: ^1.9.0

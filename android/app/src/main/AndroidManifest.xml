@@ -11,7 +11,8 @@
     <application
         android:label="Document Scanner"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:requestLegacyExternalStorage="true">
         <activity
 
             android:enableOnBackInvokedCallback="true"
