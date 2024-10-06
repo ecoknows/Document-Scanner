@@ -13,12 +13,18 @@ final class GetScannedDocumentsInProgress extends GetScannedDocumentsState {
 }
 
 final class GetScannedDocumentsSuccess extends GetScannedDocumentsState {
-  final List<String> documents;
+  final List<GetScannedDocument> documents;
+  final List<String> images;
+  final List<String> pdfs;
 
-  GetScannedDocumentsSuccess({required this.documents});
+  GetScannedDocumentsSuccess({
+    required this.documents,
+    required this.images,
+    required this.pdfs,
+  });
 
   @override
-  List<Object?> get props => [documents];
+  List<Object?> get props => [documents, images, pdfs];
 }
 
 final class GetScannedDocumentsFail extends GetScannedDocumentsState {

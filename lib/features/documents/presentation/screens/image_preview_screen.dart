@@ -4,11 +4,11 @@ import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:document_scanner/common/classes/save_image_class.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:image_preview/src/image_gallery.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:image_preview/src/image_gallery.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 
 class ImagePreviewScreen extends StatefulWidget {
@@ -34,8 +34,8 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
         if (getScannedDocumentsState is GetScannedDocumentsSuccess &&
             index != null) {
           return ImageGalleryPage(
-            imageUrls: getScannedDocumentsState.documents,
-            heroTags: getScannedDocumentsState.documents,
+            imageUrls: getScannedDocumentsState.images,
+            heroTags: getScannedDocumentsState.images,
             initialIndex: int.parse(index),
             onPageChanged: (i, widget) async {
               return Container(
@@ -50,7 +50,7 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
 
                         final PdfImage image = PdfBitmap(
                           await SaveFile.readImageDataFromNetwork(
-                            getScannedDocumentsState.documents[i],
+                            getScannedDocumentsState.images[i],
                           ),
                         );
 
@@ -81,7 +81,7 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
                     InkWell(
                       onTap: () async {
                         String imageStorageUrl =
-                            getScannedDocumentsState.documents[i];
+                            getScannedDocumentsState.documents[i].image;
 
                         AnimatedSnackBar.material(
                           "Image saved to gallery.",

@@ -1,19 +1,11 @@
-import 'dart:io';
-
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
-import 'package:document_scanner/base/widgets/base_appbar.dart';
 import 'package:document_scanner/common/classes/save_image_class.dart';
 import 'package:document_scanner/common/widgets/authenticated_appbar.dart';
-import 'package:document_scanner/features/auth/presentation/blocs/auth_bloc.dart';
-import 'package:document_scanner/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_scanned_documents_bloc.dart';
-import 'package:document_scanner/features/documents/presentation/screens/documents_screen.dart';
+import 'package:document_scanner/features/documents/presentation/screens/images_screen.dart';
 import 'package:document_scanner/features/home/presentation/screens/home_screen.dart';
 import 'package:document_scanner/features/notifications/presentation/screens/notification_screen.dart';
-import 'package:document_scanner/features/profile/presentation/screens/profile_screen.dart';
-import 'package:document_scanner/features/settings/presentation/screens/settings_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -98,18 +90,13 @@ class _BaseScaffoldDocumentScannerState
                     Rect.fromLTWH(0, 0, page.size.width, page.size.height));
               }
 
-              List<int> bytes = await document.save();
-
-              SaveFile.saveAndLaunchFile(
-                  bytes, '${DateTime.now().millisecondsSinceEpoch}.pdf');
-
               document.dispose();
 
               context.read<UploadScannedDocumentsBloc>().add(
                     UploadScannedDocumentsStarted(pictures: pictures),
                   );
 
-              context.pushNamed(DocumentsScreen.name);
+              context.pushNamed(ImagesScreen.name);
             }
           } catch (exception) {
             // Handle exception here

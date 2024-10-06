@@ -4,8 +4,10 @@ import 'package:document_scanner/features/auth/presentation/screens/sign_in_scre
 import 'package:document_scanner/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_scanned_documents_bloc.dart';
-import 'package:document_scanner/features/documents/presentation/screens/documents_screen.dart';
+import 'package:document_scanner/features/documents/presentation/screens/images_screen.dart';
 import 'package:document_scanner/features/documents/presentation/screens/image_preview_screen.dart';
+import 'package:document_scanner/features/documents/presentation/screens/pdf_preview_screen.dart';
+import 'package:document_scanner/features/documents/presentation/screens/pdfs_screen.dart';
 import 'package:document_scanner/features/home/presentation/screens/home_screen.dart';
 import 'package:document_scanner/features/notifications/presentation/screens/notification_screen.dart';
 import 'package:document_scanner/features/profile/presentation/screens/profile_screen.dart';
@@ -40,8 +42,9 @@ class _AppState extends State<App> {
             if (uploadScannedDocumentsState is UploadScannedDocumentsSuccess) {
               context.read<GetScannedDocumentsBloc>().add(
                     AddScannedDocumentsStarted(
-                      scannedDocuments:
-                          uploadScannedDocumentsState.latestUploaded,
+                      documents: uploadScannedDocumentsState.documents,
+                      images: uploadScannedDocumentsState.images,
+                      pdfs: uploadScannedDocumentsState.pdfs,
                     ),
                   );
             }
@@ -88,10 +91,17 @@ class _AppState extends State<App> {
               },
             ),
             GoRoute(
-              path: '/documents',
-              name: DocumentsScreen.name,
+              path: '/images',
+              name: ImagesScreen.name,
               pageBuilder: (BuildContext context, GoRouterState state) {
-                return const NoTransitionPage(child: DocumentsScreen());
+                return const NoTransitionPage(child: ImagesScreen());
+              },
+            ),
+            GoRoute(
+              path: '/pdfs',
+              name: PdfsScreen.name,
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                return const NoTransitionPage(child: PdfsScreen());
               },
             ),
             GoRoute(
@@ -115,6 +125,17 @@ class _AppState extends State<App> {
                 return NoTransitionPage(
                   child: ImagePreviewScreen(
                     index: state.pathParameters['index'] as String,
+                  ),
+                );
+              },
+            ),
+            GoRoute(
+              path: '/pdf-preview/:pdfName',
+              name: PdfPreviewScreen.name,
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                return NoTransitionPage(
+                  child: PdfPreviewScreen(
+                    pdfName: state.pathParameters['pdfName'] as String,
                   ),
                 );
               },

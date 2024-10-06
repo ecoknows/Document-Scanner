@@ -1,21 +1,23 @@
 import 'package:document_scanner/base/widgets/base_scaffold.dart';
+import 'package:document_scanner/common/classes/get_scanned_document.dart';
 import 'package:document_scanner/common/widgets/authenticated_appbar.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/screens/image_preview_screen.dart';
+import 'package:document_scanner/features/documents/presentation/screens/pdf_preview_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class DocumentsScreen extends StatefulWidget {
-  static String name = 'Documents';
+class ImagesScreen extends StatefulWidget {
+  static String name = 'Images';
 
-  const DocumentsScreen({super.key});
+  const ImagesScreen({super.key});
 
   @override
-  State<DocumentsScreen> createState() => _DocumentsScreenState();
+  State<ImagesScreen> createState() => _DocumentsScreenState();
 }
 
-class _DocumentsScreenState extends State<DocumentsScreen> {
+class _DocumentsScreenState extends State<ImagesScreen> {
   @override
   void initState() {
     super.initState();
@@ -24,7 +26,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   @override
   Widget build(BuildContext context) {
     return BaseScaffold(
-      appBar: AuthenticatedAppBar(title: DocumentsScreen.name),
+      appBar: AuthenticatedAppBar(title: ImagesScreen.name),
       body: BlocBuilder<GetScannedDocumentsBloc, GetScannedDocumentsState>(
         builder: (context, getScannedDocumentsState) {
           if (getScannedDocumentsState is GetScannedDocumentsInProgress) {
@@ -36,9 +38,9 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           }
 
           if (getScannedDocumentsState is GetScannedDocumentsSuccess) {
-            List<String> documents = getScannedDocumentsState.documents;
+            List<String> images = getScannedDocumentsState.images;
 
-            if (documents.isEmpty) {
+            if (images.isEmpty) {
               return Column(
                 children: [
                   const SizedBox(
@@ -66,16 +68,18 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
               mainAxisSpacing: 8.0,
               crossAxisSpacing: 8.0,
               children: [
-                for (final (index, document) in documents.indexed)
+                for (final (index, image) in images.indexed)
                   InkWell(
                     onTap: () {
-                      context
-                          .pushNamed(ImagePreviewScreen.name, pathParameters: {
-                        "index": index.toString(),
-                      });
+                      context.pushNamed(
+                        ImagePreviewScreen.name,
+                        pathParameters: {
+                          "index": index.toString(),
+                        },
+                      );
                     },
                     child: Image.network(
-                      document,
+                      image,
                       height: 100,
                       width: 100,
                       fit: BoxFit.cover,

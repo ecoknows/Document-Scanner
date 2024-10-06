@@ -1,7 +1,8 @@
 import 'package:document_scanner/base/widgets/base_appbar.dart';
 import 'package:document_scanner/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:document_scanner/features/auth/presentation/screens/sign_in_screen.dart';
-import 'package:document_scanner/features/documents/presentation/screens/documents_screen.dart';
+import 'package:document_scanner/features/documents/presentation/screens/images_screen.dart';
+import 'package:document_scanner/features/documents/presentation/screens/pdfs_screen.dart';
 import 'package:document_scanner/features/profile/presentation/screens/profile_screen.dart';
 import 'package:document_scanner/features/settings/presentation/screens/settings_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -56,8 +57,11 @@ class AuthenticatedAppBar extends StatelessWidget
                 case "settings":
                   context.pushNamed(SettingsScreen.name);
                   break;
-                case "documents":
-                  context.pushNamed(DocumentsScreen.name);
+                case "images":
+                  context.pushNamed(ImagesScreen.name);
+                  break;
+                case "pdfs":
+                  context.pushNamed(PdfsScreen.name);
                   break;
                 case "my-profile":
                   context.pushNamed(ProfileScreen.name);
@@ -83,15 +87,33 @@ class AuthenticatedAppBar extends StatelessWidget
                         color: Colors.black,
                         fontSize: 14)),
               ),
+              const PopupMenuDivider(),
               const PopupMenuItem(
-                value: "documents",
+                value: "images",
                 height: 0,
                 padding: EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 8,
                 ),
                 child: Text(
-                  'Documents',
+                  'Images',
+                  style: TextStyle(
+                    fontFamily: 'OpenSauceTwo',
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              const PopupMenuItem(
+                value: "pdfs",
+                height: 0,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Text(
+                  "PDF's",
                   style: TextStyle(
                     fontFamily: 'OpenSauceTwo',
                     fontWeight: FontWeight.w600,

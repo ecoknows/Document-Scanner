@@ -8,10 +8,16 @@ final class GetScannedDocumentsStarted extends GetScannedDocumentsEvent {
 }
 
 final class AddScannedDocumentsStarted extends GetScannedDocumentsEvent {
-  final List<String> scannedDocuments;
+  final List<GetScannedDocument> documents;
+  final List<String> images;
+  final List<String> pdfs;
 
-  AddScannedDocumentsStarted({required this.scannedDocuments});
+  AddScannedDocumentsStarted({
+    required this.documents,
+    required this.images,
+    required this.pdfs,
+  });
 
   @override
-  List<Object?> get props => [scannedDocuments];
+  List<Object?> get props => [documents, images, pdfs];
 }

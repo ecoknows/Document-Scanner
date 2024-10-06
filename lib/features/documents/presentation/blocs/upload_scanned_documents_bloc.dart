@@ -1,11 +1,15 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:bloc/bloc.dart';
+import 'package:document_scanner/common/classes/get_scanned_document.dart';
+import 'package:document_scanner/common/classes/save_image_class.dart';
 import 'package:document_scanner/features/auth/core/services/firebase_services.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:path/path.dart' as p;
 
 part 'upload_scanned_documents_event.dart';
@@ -26,26 +30,32 @@ class UploadScannedDocumentsBloc
     List<String> pictures = event.pictures;
 
     User? user = _auth.auth.currentUser;
+    final storageRef = FirebaseStorage.instance.ref();
 
     if (user != null) {
-      final String userPath = "images/scanned_documents/${user.uid}";
-      final List<String> latestUpladedDocuments = [];
+      final String documentName =
+          DateTime.now().microsecondsSinceEpoch.toString();
 
-      for (String picture in pictures) {
-        final String extension = p.extension(picture);
+      final String imageUserPath =
+          "images/scanned_documents/${user.uid}/$documentName";
+
+      final List<GetScannedDocument> documents = [];
+      final List<String> images = [];
+      final List<String> pdfs = [];
+
+      PdfDocument pdfDocument = PdfDocument();
+
+      for (var (index, picture) in pictures.indexed) {
         final File image = File(picture);
-        UploadTask? uploadTask;
+        UploadTask? uploadImagesTask;
 
-        final String imageName =
-            DateTime.now().microsecondsSinceEpoch.toString();
+        final String imagePath = "$imageUserPath/$documentName.$index.jpg";
 
-        final String imagePath = "$userPath/$imageName$extension";
+        final imageStorage = storageRef.child(imagePath);
 
-        final ref = FirebaseStorage.instance.ref().child(imagePath);
+        uploadImagesTask = imageStorage.putFile(image);
 
-        uploadTask = ref.putFile(image);
-
-        uploadTask.snapshotEvents.listen((event) {
+        uploadImagesTask.snapshotEvents.listen((event) {
           double progress =
               event.bytesTransferred.toDouble() / event.totalBytes.toDouble();
           EasyLoading.showProgress(progress,
@@ -54,16 +64,71 @@ class UploadScannedDocumentsBloc
           throw Exception('Something went wrong uploading image.');
         });
 
-        TaskSnapshot snapshot = await uploadTask.whenComplete(() => {
-              EasyLoading.dismiss(),
-            });
+        TaskSnapshot imageSnapshot =
+            await uploadImagesTask.whenComplete(() async {
+          EasyLoading.dismiss();
+        });
 
-        latestUpladedDocuments.add(await snapshot.ref.getDownloadURL());
+        var imageDownloadUrl = await imageSnapshot.ref.getDownloadURL();
+        images.add(imageDownloadUrl);
+
+        PdfPage page = pdfDocument.pages.add();
+
+        final PdfImage pdfImage = PdfBitmap(image.readAsBytesSync());
+
+        page.graphics.drawImage(
+          pdfImage,
+          Rect.fromLTWH(
+            0,
+            0,
+            page.size.width,
+            page.size.height,
+          ),
+        );
       }
+
+      // PDF Process
+      final String pdfUserPath = "pdf/scanned_documents/${user.uid}";
+      final String pdfPath = "$pdfUserPath/$documentName.pdf";
+      final pdfRef = storageRef.child(pdfPath);
+      UploadTask? pdfUploadTask;
+
+      List<int> bytes = await pdfDocument.save();
+
+      final File pdfFile =
+          await SaveFile.bytesToFile(bytes, "$documentName.pdf");
+
+      pdfUploadTask = pdfRef.putFile(pdfFile);
+
+      pdfUploadTask.snapshotEvents.listen((event) {
+        double progress =
+            event.bytesTransferred.toDouble() / event.totalBytes.toDouble();
+        EasyLoading.showProgress(progress,
+            status: '${(progress * 100).round()}%');
+      }).onError((error) {
+        throw Exception('Something went wrong uploading pdf.');
+      });
+
+      TaskSnapshot pdfSnapshot = await pdfUploadTask.whenComplete(() {
+        EasyLoading.dismiss();
+      });
+
+      var pdfDownloadUrl = await pdfSnapshot.ref.getDownloadURL();
+      pdfs.add(pdfDownloadUrl);
+
+      pdfDocument.dispose();
+
+      documents.add(GetScannedDocument(
+        name: documentName,
+        image: images.first,
+        pdf: pdfDownloadUrl,
+      ));
 
       emit(
         UploadScannedDocumentsSuccess(
-          latestUploaded: latestUpladedDocuments,
+          documents: documents,
+          images: images,
+          pdfs: pdfs,
         ),
       );
     } else {

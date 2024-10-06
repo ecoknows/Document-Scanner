@@ -1,7 +1,7 @@
 name: "document_scanner"
 description: "Document Scanner"
 publish_to: 'none'
-version: 0.2.1
+version: 0.3.1
 
 environment:
   sdk: '>=3.3.3 <4.0.0'
@@ -14,6 +14,7 @@ dependencies:
   carousel_slider: ^4.2.1
   cloud_firestore: ^4.16.0
   cunning_document_scanner: ^1.2.2
+  easy_pdf_viewer: ^1.0.8
   equatable: ^2.0.5
   file_picker: ^8.0.0+1
   firebase_auth: ^4.19.0
