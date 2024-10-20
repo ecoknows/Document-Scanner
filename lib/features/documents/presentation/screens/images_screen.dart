@@ -133,7 +133,7 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                                 MoveImageFolderStarted(
                                   folder: folder,
                                   documents: documents,
-                                  images: images,
+                                  images: selectedImages,
                                 ),
                               );
                           setState(() {
