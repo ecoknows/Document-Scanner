@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:bloc/bloc.dart';
 import 'package:document_scanner/common/classes/get_scanned_document.dart';
 import 'package:document_scanner/common/classes/save_image_class.dart';
-import 'package:document_scanner/features/auth/core/services/firebase_services.dart';
+import 'package:document_scanner/features/auth/core/services/firebase_auth_services.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';

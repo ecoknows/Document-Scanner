@@ -21,3 +21,14 @@ final class AddScannedDocumentsStarted extends GetScannedDocumentsEvent {
   @override
   List<Object?> get props => [documents, images, pdfs];
 }
+
+final class RemoveImagesStarted extends GetScannedDocumentsEvent {
+  final List<String> images;
+
+  RemoveImagesStarted({
+    required this.images,
+  });
+
+  @override
+  List<Object?> get props => [images];
+}

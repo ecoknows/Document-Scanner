@@ -16,13 +16,16 @@ class BaseScaffold extends StatelessWidget {
   final FloatingActionButton? floatingActionButton;
   final Widget? bottomNavigationBar;
   final PreferredSizeWidget? appBar;
+  FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  const BaseScaffold({
+  BaseScaffold({
     super.key,
     required this.body,
     this.floatingActionButton,
     this.bottomNavigationBar,
     this.appBar,
+    this.floatingActionButtonLocation =
+        FloatingActionButtonLocation.centerDocked,
   });
 
   @override
@@ -31,7 +34,7 @@ class BaseScaffold extends StatelessWidget {
       extendBody: true,
       appBar: appBar,
       body: body,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: floatingActionButtonLocation,
       floatingActionButton: floatingActionButton,
       bottomNavigationBar: bottomNavigationBar,
     );

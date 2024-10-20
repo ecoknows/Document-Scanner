@@ -1,6 +1,11 @@
 import 'package:document_scanner/app.dart';
 import 'package:document_scanner/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/create_image_folder_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/get_folder_images_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/image_preview_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/move_image_folder_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/rename_folder_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_scanned_documents_bloc.dart';
 import 'package:document_scanner/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -25,6 +30,11 @@ class Main extends StatelessWidget {
         BlocProvider(create: (_) => AuthBloc()),
         BlocProvider(create: (_) => GetScannedDocumentsBloc()),
         BlocProvider(create: (_) => UploadScannedDocumentsBloc()),
+        BlocProvider(create: (_) => CreateImageFolderBloc()),
+        BlocProvider(create: (_) => MoveImageFolderBloc()),
+        BlocProvider(create: (_) => RenameFolderBloc()),
+        BlocProvider(create: (_) => GetFolderImagesBloc()),
+        BlocProvider(create: (_) => ImagePreviewBloc()),
       ],
       child: const App(),
     );

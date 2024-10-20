@@ -13,20 +13,24 @@ import 'package:go_router/go_router.dart';
 class AuthenticatedAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   final String title;
+  final Widget? primaryWidget;
 
   const AuthenticatedAppBar({
     super.key,
     required this.title,
+    this.primaryWidget,
   });
 
   @override
   Widget build(BuildContext context) {
     User? currentUser = FirebaseAuth.instance.currentUser;
     String? photoUrl = currentUser?.photoURL;
+    Widget? primary = primaryWidget;
 
     return BaseAppBar(
       title: Text(title),
       actions: [
+        if (primary != null) primary,
         if (currentUser != null && photoUrl != null)
           PopupMenuButton(
             position: PopupMenuPosition.under,

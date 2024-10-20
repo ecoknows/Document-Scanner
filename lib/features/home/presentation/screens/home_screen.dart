@@ -1,5 +1,4 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:document_scanner/features/home/presentation/widgets/how_it_works.dart';
 import 'package:document_scanner/features/home/presentation/widgets/key_features.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

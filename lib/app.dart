@@ -4,6 +4,7 @@ import 'package:document_scanner/features/auth/presentation/screens/sign_in_scre
 import 'package:document_scanner/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_scanned_documents_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/screens/folder_screen.dart';
 import 'package:document_scanner/features/documents/presentation/screens/images_screen.dart';
 import 'package:document_scanner/features/documents/presentation/screens/image_preview_screen.dart';
 import 'package:document_scanner/features/documents/presentation/screens/pdf_preview_screen.dart';
@@ -136,6 +137,18 @@ class _AppState extends State<App> {
                 return NoTransitionPage(
                   child: PdfPreviewScreen(
                     pdfName: state.pathParameters['pdfName'] as String,
+                  ),
+                );
+              },
+            ),
+            GoRoute(
+              path: '/folder/:folderId/:folderName',
+              name: FolderScreen.name,
+              pageBuilder: (BuildContext context, GoRouterState state) {
+                return NoTransitionPage(
+                  child: FolderScreen(
+                    folderId: state.pathParameters['folderId'] as String,
+                    folderName: state.pathParameters['folderName'] as String,
                   ),
                 );
               },

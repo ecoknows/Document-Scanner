@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:document_scanner/features/auth/core/exceptions/auth_execptions.dart';
-import 'package:document_scanner/features/auth/core/services/firebase_services.dart';
+import 'package:document_scanner/features/auth/core/services/firebase_auth_services.dart';
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';

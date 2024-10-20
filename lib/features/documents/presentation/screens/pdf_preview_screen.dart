@@ -1,6 +1,6 @@
 import 'package:document_scanner/base/widgets/base_scaffold.dart';
 import 'package:document_scanner/common/widgets/authenticated_appbar.dart';
-import 'package:document_scanner/features/auth/core/services/firebase_services.dart';
+import 'package:document_scanner/features/auth/core/services/firebase_auth_services.dart';
 import 'package:easy_pdf_viewer/easy_pdf_viewer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';

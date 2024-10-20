@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:document_scanner/common/classes/save_image_class.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/image_preview_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
@@ -29,13 +30,12 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
   @override
   Widget build(BuildContext context) {
     String? index = widget.index;
-    return BlocBuilder<GetScannedDocumentsBloc, GetScannedDocumentsState>(
-      builder: (_, getScannedDocumentsState) {
-        if (getScannedDocumentsState is GetScannedDocumentsSuccess &&
-            index != null) {
+    return BlocBuilder<ImagePreviewBloc, ImagePreviewState>(
+      builder: (_, imagePreviewState) {
+        if (imagePreviewState is ImagePreviewSuccess && index != null) {
           return ImageGalleryPage(
-            imageUrls: getScannedDocumentsState.images,
-            heroTags: getScannedDocumentsState.images,
+            imageUrls: imagePreviewState.images,
+            heroTags: imagePreviewState.images,
             initialIndex: int.parse(index),
             onPageChanged: (i, widget) async {
               return Container(
@@ -50,7 +50,7 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
 
                         final PdfImage image = PdfBitmap(
                           await SaveFile.readImageDataFromNetwork(
-                            getScannedDocumentsState.images[i],
+                            imagePreviewState.images[i],
                           ),
                         );
 
@@ -80,8 +80,7 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
                     ),
                     InkWell(
                       onTap: () async {
-                        String imageStorageUrl =
-                            getScannedDocumentsState.documents[i].image;
+                        String imageStorageUrl = imagePreviewState.images[i];
 
                         AnimatedSnackBar.material(
                           "Image saved to gallery.",
