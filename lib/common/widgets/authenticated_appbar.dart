@@ -12,7 +12,7 @@ import 'package:go_router/go_router.dart';
 
 class AuthenticatedAppBar extends StatelessWidget
     implements PreferredSizeWidget {
-  final String title;
+  final String? title;
   final Widget? primaryWidget;
 
   const AuthenticatedAppBar({
@@ -26,9 +26,31 @@ class AuthenticatedAppBar extends StatelessWidget
     User? currentUser = FirebaseAuth.instance.currentUser;
     String? photoUrl = currentUser?.photoURL;
     Widget? primary = primaryWidget;
+    String? appTitle = title;
 
     return BaseAppBar(
-      title: Text(title),
+      title: appTitle != null
+          ? Text(appTitle)
+          : Row(
+              children: [
+                Image.asset(
+                  'assets/images/logo.jpg', // Path to your logo image
+                  height: 40, // Adjust height as needed
+                ),
+                const SizedBox(
+                  width: 8,
+                ), // Add spacing between the logo and title
+                Expanded(
+                  child: Text(
+                    "MOBILE DOCUMENT \nSCANNER APP FOR PSU",
+                    maxLines: 2,
+                    overflow: TextOverflow.visible,
+                    softWrap: true,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+              ],
+            ),
       actions: [
         if (primary != null) primary,
         if (currentUser != null && photoUrl != null)

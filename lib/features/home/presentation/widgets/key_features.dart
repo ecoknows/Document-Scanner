@@ -12,191 +12,97 @@ class KeyFeatures extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Card(
-                  surfaceTintColor: Colors.white,
-                  elevation: 3,
-                  child: Container(
-                    height: 120,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6.0, vertical: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.camera_alt,
-                          size: 30.0,
-                        ),
-                        const SizedBox(
-                          height: 4.0,
-                        ),
-                        Text(
-                          "Instant document capture.",
-                          style: Theme.of(context).textTheme.labelSmall,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              const Icon(
+                Icons.camera_alt,
+                size: 30.0,
               ),
-              Expanded(
-                child: Card(
-                  surfaceTintColor: Colors.white,
-                  elevation: 3,
-                  child: Container(
-                    height: 120,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6.0, vertical: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.cloud,
-                          size: 30.0,
-                        ),
-                        const SizedBox(
-                          height: 4.0,
-                        ),
-                        Text(
-                          "Secure cloud storage.",
-                          style: Theme.of(context).textTheme.labelSmall,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              const SizedBox(
+                width: 4.0,
               ),
-              Expanded(
-                child: Card(
-                  surfaceTintColor: Colors.white,
-                  elevation: 3,
-                  child: Container(
-                    height: 120,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6.0, vertical: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.picture_as_pdf,
-                          size: 30.0,
-                        ),
-                        const SizedBox(
-                          height: 4.0,
-                        ),
-                        Text(
-                          "Convert image to pfd",
-                          style: Theme.of(context).textTheme.labelSmall,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              Text(
+                "Instant document capture.",
+                style: Theme.of(context).textTheme.labelSmall,
+                textAlign: TextAlign.center,
               ),
             ],
+          ),
+          const SizedBox(
+            height: 8.0,
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Card(
-                  surfaceTintColor: Colors.white,
-                  elevation: 3,
-                  child: Container(
-                    height: 120,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6.0, vertical: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.offline_share,
-                          size: 30.0,
-                        ),
-                        const SizedBox(
-                          height: 4.0,
-                        ),
-                        Text(
-                          "Convert document offline.",
-                          style: Theme.of(context).textTheme.labelSmall,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              const Icon(
+                Icons.cloud,
+                size: 30.0,
               ),
-              Expanded(
-                child: Card(
-                  surfaceTintColor: Colors.white,
-                  elevation: 3,
-                  child: Container(
-                    height: 120,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6.0, vertical: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.high_quality,
-                          size: 30.0,
-                        ),
-                        const SizedBox(
-                          height: 4.0,
-                        ),
-                        Text(
-                          "High resolution conversion.",
-                          style: Theme.of(context).textTheme.labelSmall,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              const SizedBox(
+                width: 4.0,
               ),
-              Expanded(
-                child: Card(
-                  surfaceTintColor: Colors.white,
-                  elevation: 3,
-                  child: Container(
-                    height: 120,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6.0, vertical: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.picture_as_pdf,
-                          size: 30.0,
-                        ),
-                        const SizedBox(
-                          height: 4.0,
-                        ),
-                        Text(
-                          "Unlimited document scan.",
-                          style: Theme.of(context).textTheme.labelSmall,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              Text(
+                "Secure cloud storage.",
+                style: Theme.of(context).textTheme.labelSmall,
+                textAlign: TextAlign.center,
               ),
             ],
           ),
+          const SizedBox(
+            height: 8.0,
+          ),
+          Row(
+            children: [
+              const Icon(
+                Icons.picture_as_pdf,
+                size: 30.0,
+              ),
+              const SizedBox(
+                width: 4.0,
+              ),
+              Text(
+                "Convert image to pfd",
+                style: Theme.of(context).textTheme.labelSmall,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 8.0,
+          ),
+          Row(
+            children: [
+              const Icon(
+                Icons.high_quality,
+                size: 30.0,
+              ),
+              const SizedBox(
+                width: 4.0,
+              ),
+              Text(
+                "High resolution conversion.",
+                style: Theme.of(context).textTheme.labelSmall,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 8.0,
+          ),
+          Row(
+            children: [
+              const Icon(
+                Icons.picture_as_pdf,
+                size: 30.0,
+              ),
+              const SizedBox(
+                width: 4.0,
+              ),
+              Text(
+                "Unlimited document scan.",
+                style: Theme.of(context).textTheme.labelSmall,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          )
         ],
       ),
     );

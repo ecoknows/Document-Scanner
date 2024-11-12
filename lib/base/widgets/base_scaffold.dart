@@ -62,7 +62,7 @@ class _BaseScaffoldDocumentScannerState
     Icons.home,
     Icons.notifications,
   ];
-  String appBarTitle = HomeScreen.name;
+  String? appBarTitle;
 
   @override
   void initState() {
