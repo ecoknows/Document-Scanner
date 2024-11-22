@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:document_scanner/base/widgets/base_scaffold.dart';
 import 'package:document_scanner/common/widgets/authenticated_appbar.dart';
 import 'package:document_scanner/features/auth/core/services/firebase_auth_services.dart';
@@ -10,11 +12,15 @@ import 'package:flutter/widgets.dart';
 
 class PdfPreviewScreen extends StatefulWidget {
   static String name = 'PDF';
-  final String? pdfName;
+  final String pdfName;
+  final String pdfPath;
+  final String isOffline;
 
   const PdfPreviewScreen({
     super.key,
     required this.pdfName,
+    required this.pdfPath,
+    required this.isOffline,
   });
 
   @override
@@ -27,8 +33,9 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
 
   Future<void> processDocument() async {
     User? user = _auth.auth.currentUser;
+    String? path = widget.pdfPath;
 
-    if (user != null) {
+    if (user != null && widget.isOffline == "no") {
       final String pdfUserPath =
           "pdf/scanned_documents/${user.uid}/${widget.pdfName}.pdf";
 
@@ -37,6 +44,13 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
 
       doc = await PDFDocument.fromURL(url);
 
+      setState(() {});
+    } else if (widget.isOffline == "yes" && path.isNotEmpty) {
+      doc = await PDFDocument.fromFile(
+        File(
+          path,
+        ),
+      );
       setState(() {});
     }
   }

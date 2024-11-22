@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -7,6 +9,7 @@ part 'image_preview_state.dart';
 class ImagePreviewBloc extends Bloc<ImagePreviewEvent, ImagePreviewState> {
   ImagePreviewBloc() : super(ImagePreviewInitial()) {
     on<ImagePreviewStarted>(_imagePreview);
+    on<ImagePreviewOfflineStarted>(_imagePreviewOffline);
   }
 
   void _imagePreview(
@@ -15,5 +18,13 @@ class ImagePreviewBloc extends Bloc<ImagePreviewEvent, ImagePreviewState> {
   ) {
     emit(ImagePreviewInProgress());
     emit(ImagePreviewSuccess(images: event.images));
+  }
+
+  void _imagePreviewOffline(
+    ImagePreviewOfflineStarted event,
+    Emitter<ImagePreviewState> emit,
+  ) {
+    emit(ImagePreviewInProgress());
+    emit(ImagePreviewOfflineSuccess(images: event.images));
   }
 }

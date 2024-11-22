@@ -1,13 +1,20 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:bloc/bloc.dart';
 import 'package:document_scanner/common/classes/firebase_helpers.dart';
 import 'package:document_scanner/common/classes/get_scanned_document.dart';
+import 'package:document_scanner/common/classes/get_scanned_document_offline.dart';
+import 'package:document_scanner/common/classes/save_image_class.dart';
 import 'package:document_scanner/features/auth/core/services/cloud_firestore_services.dart';
 import 'package:document_scanner/features/auth/core/services/firebase_auth_services.dart';
+import 'package:document_scanner/features/auth/data/entities/document_model.dart';
 import 'package:document_scanner/features/documents/data/image_folder.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:hive/hive.dart';
 
 part 'get_scanned_documents_event.dart';
 part 'get_scanned_documents_state.dart';
@@ -19,8 +26,61 @@ class GetScannedDocumentsBloc
 
   GetScannedDocumentsBloc() : super(GetScannedDocumentsInitial()) {
     on<GetScannedDocumentsStarted>(_getScannedDocuments);
+    on<GetScannedDocumentsOfflineStarted>(_getScannedDocumentsOffline);
     on<AddScannedDocumentsStarted>(_addScannedDocuments);
     on<RemoveImagesStarted>(_removeImages);
+    on<AddScannedDocumentsOfflineStarted>(_addScannedDocumentsOfflineStarted);
+  }
+
+  void _getScannedDocumentsOffline(
+    GetScannedDocumentsOfflineStarted event,
+    Emitter<GetScannedDocumentsState> emit,
+  ) async {
+    final box = await Hive.openBox<DocumentModel>('documentsBox');
+
+    final documents = box.values.toList();
+    List<File> images = [];
+    List<String> imagesPath = [];
+    List<GetScannedDocumentOffline> documentOffline = [];
+
+    for (var document in documents) {
+      File image = await SaveFile.uint8ListToFile(
+        document.images.first,
+        "${document.name}.0.jpg",
+      );
+
+      File pdf = await SaveFile.uint8ListToFile(
+        document.pdf,
+        "${document.name}.pdf",
+      );
+
+      documentOffline.add(
+        GetScannedDocumentOffline(
+          document: document,
+          name: document.name,
+          image: image,
+          pdf: pdf,
+        ),
+      );
+
+      for (var (index, bytes) in document.images.indexed) {
+        File convertedImage = await SaveFile.uint8ListToFile(
+          bytes,
+          "${document.name}.$index.jpg",
+        );
+
+        images.add(convertedImage);
+        imagesPath.add(convertedImage.path);
+      }
+    }
+
+    emit(
+      GetScannedDocumentsOfflineSuccess(
+        documents: documentOffline,
+        images: images,
+        imagesPath: imagesPath,
+      ),
+    );
   }
 
   void _getScannedDocuments(
@@ -137,6 +197,56 @@ class GetScannedDocumentsBloc
         documents: currentState.documents,
         images: images,
         pdfs: currentState.pdfs,
+      ));
+    }
+  }
+
+  void _addScannedDocumentsOfflineStarted(
+    AddScannedDocumentsOfflineStarted event,
+    Emitter<GetScannedDocumentsState> emit,
+  ) async {
+    GetScannedDocumentsState currentState = state;
+
+    if (currentState is GetScannedDocumentsOfflineSuccess) {
+      List<GetScannedDocumentOffline> documents =
+          List.from(currentState.documents);
+      List<File> images = List.from(currentState.images);
+      List<String> imagesPath = List.from(currentState.imagesPath);
+
+      for (var (index, bytes) in event.document.images.indexed) {
+        images.add(
+          await SaveFile.uint8ListToFile(
+            bytes,
+            "${event.document.name}.$index.jpg",
+          ),
+        );
+      }
+
+      File image = await SaveFile.uint8ListToFile(
+        event.document.images.first,
+        "${event.document.name}.0.jpg",
+      );
+
+      File pdf = await SaveFile.uint8ListToFile(
+        event.document.pdf,
+        "${event.document.name}.pdf",
+      );
+
+      imagesPath.add(image.path);
+
+      documents.add(
+        GetScannedDocumentOffline(
+          document: event.document,
+          name: event.document.name,
+          image: image,
+          pdf: pdf,
+        ),
+      );
+
+      emit(GetScannedDocumentsOfflineSuccess(
+        documents: documents,
+        images: images,
+        imagesPath: imagesPath,
       ));
     }
   }

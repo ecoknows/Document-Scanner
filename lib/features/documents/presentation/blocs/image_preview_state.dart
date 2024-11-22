@@ -21,6 +21,15 @@ final class ImagePreviewSuccess extends ImagePreviewState {
   List<Object> get props => [images];
 }
 
+final class ImagePreviewOfflineSuccess extends ImagePreviewState {
+  final List<File> images;
+
+  ImagePreviewOfflineSuccess({required this.images});
+
+  @override
+  List<Object> get props => [images];
+}
+
 final class ImagePreviewFail extends ImagePreviewState {
   @override
   List<Object> get props => [];

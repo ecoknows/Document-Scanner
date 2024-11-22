@@ -1,5 +1,6 @@
 import 'package:document_scanner/base/themes/base_theme_data.dart';
 import 'package:document_scanner/base/widgets/base_scaffold.dart';
+import 'package:document_scanner/common/bloc/connectivity_bloc.dart';
 import 'package:document_scanner/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:document_scanner/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
@@ -30,8 +31,7 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-
-    context.read<GetScannedDocumentsBloc>().add(GetScannedDocumentsStarted());
+    context.read<ConnectivityBloc>().add(ConnectivityStarted());
   }
 
   @override
@@ -49,126 +49,162 @@ class _AppState extends State<App> {
                     ),
                   );
             }
+            if (uploadScannedDocumentsState
+                is UploadScannedDocumentsOfflineSuccess) {
+              context.read<GetScannedDocumentsBloc>().add(
+                    AddScannedDocumentsOfflineStarted(
+                      document: uploadScannedDocumentsState.document,
+                    ),
+                  );
+            }
+          },
+        ),
+        BlocListener<ConnectivityBloc, ConnectivityState>(
+          listener: (_, connectivityState) {
+            if (connectivityState is ConnectivitySuccess) {
+              if (connectivityState.isConnectedToInternet) {
+                context
+                    .read<GetScannedDocumentsBloc>()
+                    .add(GetScannedDocumentsStarted());
+              } else {
+                context
+                    .read<GetScannedDocumentsBloc>()
+                    .add(GetScannedDocumentsOfflineStarted());
+              }
+            }
           },
         ),
       ],
-      child: MaterialApp.router(
-        title: 'Flutter Demo',
-        builder: EasyLoading.init(),
-        theme: BaseThemeData.primaryLightTheme,
-        darkTheme: BaseThemeData.primaryDarkTheme,
-        themeMode: ThemeMode.light,
-        routerConfig: GoRouter(
-          initialLocation: '/home',
-          routes: [
-            ShellRoute(
+      child: BlocBuilder<ConnectivityBloc, ConnectivityState>(
+        builder: (_, connectivityState) {
+          if (connectivityState is! ConnectivitySuccess) {
+            return Container();
+          }
+
+          return MaterialApp.router(
+            title: 'Flutter Demo',
+            builder: EasyLoading.init(),
+            theme: BaseThemeData.primaryLightTheme,
+            darkTheme: BaseThemeData.primaryDarkTheme,
+            themeMode: ThemeMode.light,
+            routerConfig: GoRouter(
+              initialLocation: '/home',
               routes: [
-                GoRoute(
-                  path: '/home',
-                  name: HomeScreen.name,
-                  redirect: (context, state) {
-                    User? currentUser = FirebaseAuth.instance.currentUser;
+                ShellRoute(
+                  routes: [
+                    GoRoute(
+                      path: '/home',
+                      name: HomeScreen.name,
+                      redirect: (context, state) {
+                        User? currentUser = FirebaseAuth.instance.currentUser;
 
-                    if (currentUser == null) {
-                      return '/sign-in';
-                    }
+                        if (currentUser == null &&
+                            connectivityState.isConnectedToInternet) {
+                          return '/sign-in';
+                        }
 
-                    return null;
-                  },
-                  pageBuilder: (BuildContext context, GoRouterState state) {
-                    return const NoTransitionPage(child: HomeScreen());
+                        return null;
+                      },
+                      pageBuilder: (BuildContext context, GoRouterState state) {
+                        return const NoTransitionPage(child: HomeScreen());
+                      },
+                    ),
+                    GoRoute(
+                      path: '/notifications',
+                      name: NotificationScreen.name,
+                      pageBuilder: (BuildContext context, GoRouterState state) {
+                        return const NoTransitionPage(
+                            child: NotificationScreen());
+                      },
+                    ),
+                  ],
+                  builder: (context, state, child) {
+                    return BaseScaffoldDocumentScanner(child: child);
                   },
                 ),
                 GoRoute(
-                  path: '/notifications',
-                  name: NotificationScreen.name,
+                  path: '/images',
+                  name: ImagesScreen.name,
                   pageBuilder: (BuildContext context, GoRouterState state) {
-                    return const NoTransitionPage(child: NotificationScreen());
+                    return const NoTransitionPage(child: ImagesScreen());
+                  },
+                ),
+                GoRoute(
+                  path: '/pdfs',
+                  name: PdfsScreen.name,
+                  pageBuilder: (BuildContext context, GoRouterState state) {
+                    return const NoTransitionPage(child: PdfsScreen());
+                  },
+                ),
+                GoRoute(
+                  path: '/profile',
+                  name: ProfileScreen.name,
+                  pageBuilder: (BuildContext context, GoRouterState state) {
+                    return const NoTransitionPage(child: ProfileScreen());
+                  },
+                ),
+                GoRoute(
+                  path: '/settings',
+                  name: SettingsScreen.name,
+                  pageBuilder: (BuildContext context, GoRouterState state) {
+                    return const NoTransitionPage(child: SettingsScreen());
+                  },
+                ),
+                GoRoute(
+                  path: '/image-preview/:index',
+                  name: ImagePreviewScreen.name,
+                  pageBuilder: (BuildContext context, GoRouterState state) {
+                    return NoTransitionPage(
+                      child: ImagePreviewScreen(
+                        index: state.pathParameters['index'] as String,
+                      ),
+                    );
+                  },
+                ),
+                GoRoute(
+                  path: '/pdf-preview/:pdfName/:pdfPath/:isOffline',
+                  name: PdfPreviewScreen.name,
+                  pageBuilder: (BuildContext context, GoRouterState state) {
+                    return NoTransitionPage(
+                      child: PdfPreviewScreen(
+                        pdfName: state.pathParameters['pdfName'] as String,
+                        pdfPath: state.pathParameters['pdfPath'] as String,
+                        isOffline: state.pathParameters['isOffline'] as String,
+                      ),
+                    );
+                  },
+                ),
+                GoRoute(
+                  path: '/folder/:folderId/:folderName',
+                  name: FolderScreen.name,
+                  pageBuilder: (BuildContext context, GoRouterState state) {
+                    return NoTransitionPage(
+                      child: FolderScreen(
+                        folderId: state.pathParameters['folderId'] as String,
+                        folderName:
+                            state.pathParameters['folderName'] as String,
+                      ),
+                    );
+                  },
+                ),
+                GoRoute(
+                  path: '/sign-in',
+                  name: SignInScreen.name,
+                  pageBuilder: (BuildContext context, GoRouterState state) {
+                    return const NoTransitionPage(child: SignInScreen());
+                  },
+                ),
+                GoRoute(
+                  path: '/sign-up',
+                  name: SignUpScreen.name,
+                  pageBuilder: (BuildContext context, GoRouterState state) {
+                    return const NoTransitionPage(child: SignUpScreen());
                   },
                 ),
               ],
-              builder: (context, state, child) {
-                return BaseScaffoldDocumentScanner(child: child);
-              },
             ),
-            GoRoute(
-              path: '/images',
-              name: ImagesScreen.name,
-              pageBuilder: (BuildContext context, GoRouterState state) {
-                return const NoTransitionPage(child: ImagesScreen());
-              },
-            ),
-            GoRoute(
-              path: '/pdfs',
-              name: PdfsScreen.name,
-              pageBuilder: (BuildContext context, GoRouterState state) {
-                return const NoTransitionPage(child: PdfsScreen());
-              },
-            ),
-            GoRoute(
-              path: '/profile',
-              name: ProfileScreen.name,
-              pageBuilder: (BuildContext context, GoRouterState state) {
-                return const NoTransitionPage(child: ProfileScreen());
-              },
-            ),
-            GoRoute(
-              path: '/settings',
-              name: SettingsScreen.name,
-              pageBuilder: (BuildContext context, GoRouterState state) {
-                return const NoTransitionPage(child: SettingsScreen());
-              },
-            ),
-            GoRoute(
-              path: '/image-preview/:index',
-              name: ImagePreviewScreen.name,
-              pageBuilder: (BuildContext context, GoRouterState state) {
-                return NoTransitionPage(
-                  child: ImagePreviewScreen(
-                    index: state.pathParameters['index'] as String,
-                  ),
-                );
-              },
-            ),
-            GoRoute(
-              path: '/pdf-preview/:pdfName',
-              name: PdfPreviewScreen.name,
-              pageBuilder: (BuildContext context, GoRouterState state) {
-                return NoTransitionPage(
-                  child: PdfPreviewScreen(
-                    pdfName: state.pathParameters['pdfName'] as String,
-                  ),
-                );
-              },
-            ),
-            GoRoute(
-              path: '/folder/:folderId/:folderName',
-              name: FolderScreen.name,
-              pageBuilder: (BuildContext context, GoRouterState state) {
-                return NoTransitionPage(
-                  child: FolderScreen(
-                    folderId: state.pathParameters['folderId'] as String,
-                    folderName: state.pathParameters['folderName'] as String,
-                  ),
-                );
-              },
-            ),
-            GoRoute(
-              path: '/sign-in',
-              name: SignInScreen.name,
-              pageBuilder: (BuildContext context, GoRouterState state) {
-                return const NoTransitionPage(child: SignInScreen());
-              },
-            ),
-            GoRoute(
-              path: '/sign-up',
-              name: SignUpScreen.name,
-              pageBuilder: (BuildContext context, GoRouterState state) {
-                return const NoTransitionPage(child: SignUpScreen());
-              },
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

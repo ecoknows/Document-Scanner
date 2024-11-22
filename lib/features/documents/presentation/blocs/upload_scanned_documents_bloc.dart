@@ -1,14 +1,17 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:bloc/bloc.dart';
 import 'package:document_scanner/common/classes/get_scanned_document.dart';
 import 'package:document_scanner/common/classes/save_image_class.dart';
 import 'package:document_scanner/features/auth/core/services/firebase_auth_services.dart';
+import 'package:document_scanner/features/auth/data/entities/document_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:hive/hive.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:path/path.dart' as p;
 
@@ -21,6 +24,63 @@ class UploadScannedDocumentsBloc
 
   UploadScannedDocumentsBloc() : super(UploadScannedDocumentsInitial()) {
     on<UploadScannedDocumentsStarted>(_uploadScannedDocuments);
+    on<UploadScannedDocumentsOfflineStarted>(_uploadScannedDocumentsOffline);
+  }
+
+  void _uploadScannedDocumentsOffline(
+    UploadScannedDocumentsOfflineStarted event,
+    Emitter<UploadScannedDocumentsState> emit,
+  ) async {
+    final box = await Hive.openBox<DocumentModel>('documentsBox');
+
+    List<String> pictures = event.pictures;
+
+    final String documentName =
+        DateTime.now().microsecondsSinceEpoch.toString();
+
+    PdfDocument pdfDocument = PdfDocument();
+
+    List<Uint8List> images = [];
+
+    for (var (index, picture) in pictures.indexed) {
+      Uint8List bytes = await File(picture).readAsBytes();
+
+      images.add(bytes);
+
+      PdfPage page = pdfDocument.pages.add();
+
+      final PdfImage pdfImage = PdfBitmap(bytes);
+
+      page.graphics.drawImage(
+        pdfImage,
+        Rect.fromLTWH(
+          0,
+          0,
+          page.size.width,
+          page.size.height,
+        ),
+      );
+    }
+
+    List<int> pdfInt = await pdfDocument.save();
+    final File pdfFile =
+        await SaveFile.bytesToFile(pdfInt, "$documentName.pdf");
+
+    Uint8List pdf = await pdfFile.readAsBytes();
+
+    pdfDocument.dispose();
+
+    final document = DocumentModel(
+      name: documentName,
+      images: images,
+      pdf: pdf,
+    );
+
+    await box.add(document);
+
+    emit(UploadScannedDocumentsOfflineSuccess(document: document));
+
+    // pdf = pdfDocument/
   }
 
   void _uploadScannedDocuments(

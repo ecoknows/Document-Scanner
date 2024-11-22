@@ -10,3 +10,12 @@ final class ImagePreviewStarted extends ImagePreviewEvent {
   @override
   List<Object> get props => [images];
 }
+
+final class ImagePreviewOfflineStarted extends ImagePreviewEvent {
+  final List<File> images;
+
+  ImagePreviewOfflineStarted({required this.images});
+
+  @override
+  List<Object> get props => [images];
+}

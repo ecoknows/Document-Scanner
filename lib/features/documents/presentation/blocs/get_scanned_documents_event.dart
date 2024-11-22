@@ -7,6 +7,11 @@ final class GetScannedDocumentsStarted extends GetScannedDocumentsEvent {
   List<Object?> get props => [];
 }
 
+final class GetScannedDocumentsOfflineStarted extends GetScannedDocumentsEvent {
+  @override
+  List<Object?> get props => [];
+}
+
 final class AddScannedDocumentsStarted extends GetScannedDocumentsEvent {
   final List<GetScannedDocument> documents;
   final List<String> images;
@@ -31,4 +36,15 @@ final class RemoveImagesStarted extends GetScannedDocumentsEvent {
 
   @override
   List<Object?> get props => [images];
+}
+
+final class AddScannedDocumentsOfflineStarted extends GetScannedDocumentsEvent {
+  final DocumentModel document;
+
+  AddScannedDocumentsOfflineStarted({
+    required this.document,
+  });
+
+  @override
+  List<Object?> get props => [document];
 }

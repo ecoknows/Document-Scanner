@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:document_scanner/app.dart';
+import 'package:document_scanner/common/bloc/connectivity_bloc.dart';
+import 'package:document_scanner/features/auth/data/entities/document_model.dart';
 import 'package:document_scanner/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/create_image_folder_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_folder_images_bloc.dart';
@@ -11,11 +15,19 @@ import 'package:document_scanner/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  Directory directory = await path_provider.getApplicationDocumentsDirectory();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  Hive
+    ..init(directory.path)
+    ..registerAdapter(DocumentModelAdapter());
 
   runApp(const Main());
 }
@@ -35,6 +47,7 @@ class Main extends StatelessWidget {
         BlocProvider(create: (_) => RenameFolderBloc()),
         BlocProvider(create: (_) => GetFolderImagesBloc()),
         BlocProvider(create: (_) => ImagePreviewBloc()),
+        BlocProvider(create: (_) => ConnectivityBloc()),
       ],
       child: const App(),
     );

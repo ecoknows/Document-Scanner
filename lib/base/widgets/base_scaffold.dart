@@ -1,5 +1,6 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
+import 'package:document_scanner/common/bloc/connectivity_bloc.dart';
 import 'package:document_scanner/common/classes/save_image_class.dart';
 import 'package:document_scanner/common/widgets/authenticated_appbar.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_scanned_documents_bloc.dart';
@@ -95,11 +96,24 @@ class _BaseScaffoldDocumentScannerState
 
               document.dispose();
 
-              context.read<UploadScannedDocumentsBloc>().add(
-                    UploadScannedDocumentsStarted(pictures: pictures),
-                  );
+              ConnectivityState connectivityState =
+                  context.read<ConnectivityBloc>().state;
 
-              context.pushNamed(ImagesScreen.name);
+              if (connectivityState is ConnectivitySuccess) {
+                if (connectivityState.isConnectedToInternet) {
+                  context.read<UploadScannedDocumentsBloc>().add(
+                        UploadScannedDocumentsStarted(pictures: pictures),
+                      );
+                } else if (connectivityState.isConnectedToInternet == false) {
+                  context.read<UploadScannedDocumentsBloc>().add(
+                        UploadScannedDocumentsOfflineStarted(
+                          pictures: pictures,
+                        ),
+                      );
+                }
+
+                context.pushNamed(ImagesScreen.name);
+              }
             }
           } catch (exception) {
             // Handle exception here

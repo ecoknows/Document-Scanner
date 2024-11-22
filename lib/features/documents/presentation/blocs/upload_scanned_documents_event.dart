@@ -10,3 +10,13 @@ final class UploadScannedDocumentsStarted extends UploadScannedDocumentsEvent {
   @override
   List<Object?> get props => [pictures];
 }
+
+final class UploadScannedDocumentsOfflineStarted
+    extends UploadScannedDocumentsEvent {
+  final List<String> pictures;
+
+  UploadScannedDocumentsOfflineStarted({required this.pictures});
+
+  @override
+  List<Object?> get props => [pictures];
+}

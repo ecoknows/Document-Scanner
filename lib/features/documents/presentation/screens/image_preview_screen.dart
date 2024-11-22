@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:animated_snack_bar/animated_snack_bar.dart';
+import 'package:document_scanner/common/bloc/connectivity_bloc.dart';
 import 'package:document_scanner/common/classes/save_image_class.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/image_preview_bloc.dart';
@@ -44,32 +46,66 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
                   children: [
                     InkWell(
                       onTap: () async {
-                        PdfDocument document = PdfDocument();
+                        ConnectivityState connectivityState =
+                            context.read<ConnectivityBloc>().state;
 
-                        PdfPage page = document.pages.add();
+                        if (connectivityState is ConnectivitySuccess) {
+                          if (connectivityState.isConnectedToInternet) {
+                            PdfDocument document = PdfDocument();
 
-                        final PdfImage image = PdfBitmap(
-                          await SaveFile.readImageDataFromNetwork(
-                            imagePreviewState.images[i],
-                          ),
-                        );
+                            PdfPage page = document.pages.add();
 
-                        page.graphics.drawImage(
-                          image,
-                          Rect.fromLTWH(
-                            0,
-                            0,
-                            page.size.width,
-                            page.size.height,
-                          ),
-                        );
+                            final PdfImage image = PdfBitmap(
+                              await SaveFile.readImageDataFromNetwork(
+                                imagePreviewState.images[i],
+                              ),
+                            );
 
-                        List<int> bytes = await document.save();
+                            page.graphics.drawImage(
+                              image,
+                              Rect.fromLTWH(
+                                0,
+                                0,
+                                page.size.width,
+                                page.size.height,
+                              ),
+                            );
 
-                        SaveFile.saveAndLaunchFile(bytes,
-                            '${DateTime.now().millisecondsSinceEpoch}.pdf');
+                            List<int> bytes = await document.save();
 
-                        document.dispose();
+                            SaveFile.saveAndLaunchFile(bytes,
+                                '${DateTime.now().millisecondsSinceEpoch}.pdf');
+
+                            document.dispose();
+                          } else if (connectivityState.isConnectedToInternet ==
+                              false) {
+                            PdfDocument document = PdfDocument();
+
+                            PdfPage page = document.pages.add();
+
+                            final PdfImage image = PdfBitmap(
+                              await File(imagePreviewState.images[i])
+                                  .readAsBytes(),
+                            );
+
+                            page.graphics.drawImage(
+                              image,
+                              Rect.fromLTWH(
+                                0,
+                                0,
+                                page.size.width,
+                                page.size.height,
+                              ),
+                            );
+
+                            List<int> bytes = await document.save();
+
+                            SaveFile.saveAndLaunchFile(bytes,
+                                '${DateTime.now().millisecondsSinceEpoch}.pdf');
+
+                            document.dispose();
+                          }
+                        }
                       },
                       child: const Center(
                         child: Text(
@@ -80,26 +116,58 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
                     ),
                     InkWell(
                       onTap: () async {
-                        String imageStorageUrl = imagePreviewState.images[i];
+                        ConnectivityState connectivityState =
+                            context.read<ConnectivityBloc>().state;
 
-                        AnimatedSnackBar.material(
-                          "Image saved to gallery.",
-                          type: AnimatedSnackBarType.success,
-                          duration: const Duration(seconds: 5),
-                          mobileSnackBarPosition: MobileSnackBarPosition.bottom,
-                        ).show(context);
+                        if (connectivityState is ConnectivitySuccess) {
+                          if (connectivityState.isConnectedToInternet) {
+                            String imageStorageUrl =
+                                imagePreviewState.images[i];
 
-                        final response =
-                            await http.get(Uri.parse(imageStorageUrl));
+                            AnimatedSnackBar.material(
+                              "Image saved to gallery.",
+                              type: AnimatedSnackBarType.success,
+                              duration: const Duration(seconds: 5),
+                              mobileSnackBarPosition:
+                                  MobileSnackBarPosition.bottom,
+                            ).show(context);
 
-                        final Uint8List bytes = response.bodyBytes;
+                            final response =
+                                await http.get(Uri.parse(imageStorageUrl));
 
-                        await ImageGallerySaver.saveImage(
-                          bytes,
-                          quality: 60,
-                          name:
-                              DateTime.now().microsecondsSinceEpoch.toString(),
-                        );
+                            final Uint8List bytes = response.bodyBytes;
+
+                            await ImageGallerySaver.saveImage(
+                              bytes,
+                              quality: 60,
+                              name: DateTime.now()
+                                  .microsecondsSinceEpoch
+                                  .toString(),
+                            );
+                          } else if (connectivityState.isConnectedToInternet ==
+                              false) {
+                            String imagePath = imagePreviewState.images[i];
+
+                            AnimatedSnackBar.material(
+                              "Image saved to gallery.",
+                              type: AnimatedSnackBarType.success,
+                              duration: const Duration(seconds: 5),
+                              mobileSnackBarPosition:
+                                  MobileSnackBarPosition.bottom,
+                            ).show(context);
+
+                            final Uint8List bytes =
+                                await File(imagePath).readAsBytes();
+
+                            await ImageGallerySaver.saveImage(
+                              bytes,
+                              quality: 60,
+                              name: DateTime.now()
+                                  .microsecondsSinceEpoch
+                                  .toString(),
+                            );
+                          }
+                        }
                       },
                       child: const Center(
                         child: Text(
@@ -115,6 +183,88 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
           );
         }
 
+        // if (imagePreviewState is ImagePreviewOfflineSuccess && index != null) {
+        //   return ImageGalleryPage(
+        //     imageUrls: imagePreviewState.images,
+        //     heroTags: imagePreviewState.images,
+        //     initialIndex: int.parse(index),
+        //     onPageChanged: (i, widget) async {
+        //       return Container(
+        //         margin: const EdgeInsets.only(top: 20),
+        //         child: Column(
+        //           children: [
+        //             InkWell(
+        //               onTap: () async {
+        //                 PdfDocument document = PdfDocument();
+
+        //                 PdfPage page = document.pages.add();
+
+        //                 final PdfImage image = PdfBitmap(
+        //                   await SaveFile.readImageDataFromNetwork(
+        //                     imagePreviewState.images[i],
+        //                   ),
+        //                 );
+
+        //                 page.graphics.drawImage(
+        //                   image,
+        //                   Rect.fromLTWH(
+        //                     0,
+        //                     0,
+        //                     page.size.width,
+        //                     page.size.height,
+        //                   ),
+        //                 );
+
+        //                 List<int> bytes = await document.save();
+
+        //                 SaveFile.saveAndLaunchFile(bytes,
+        //                     '${DateTime.now().millisecondsSinceEpoch}.pdf');
+
+        //                 document.dispose();
+        //               },
+        //               child: const Center(
+        //                 child: Text(
+        //                   'Click this to download document',
+        //                   style: TextStyle(color: Colors.white),
+        //                 ),
+        //               ),
+        //             ),
+        //             InkWell(
+        //               onTap: () async {
+        //                 String imageStorageUrl = imagePreviewState.images[i];
+
+        //                 AnimatedSnackBar.material(
+        //                   "Image saved to gallery.",
+        //                   type: AnimatedSnackBarType.success,
+        //                   duration: const Duration(seconds: 5),
+        //                   mobileSnackBarPosition: MobileSnackBarPosition.bottom,
+        //                 ).show(context);
+
+        //                 final response =
+        //                     await http.get(Uri.parse(imageStorageUrl));
+
+        //                 final Uint8List bytes = response.bodyBytes;
+
+        //                 await ImageGallerySaver.saveImage(
+        //                   bytes,
+        //                   quality: 60,
+        //                   name:
+        //                       DateTime.now().microsecondsSinceEpoch.toString(),
+        //                 );
+        //               },
+        //               child: const Center(
+        //                 child: Text(
+        //                   'Click this to save image to gallery',
+        //                   style: TextStyle(color: Colors.white),
+        //                 ),
+        //               ),
+        //             ),
+        //           ],
+        //         ),
+        //       );
+        //     },
+        //   );
+        // }
         return Container();
       },
     );
