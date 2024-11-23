@@ -4,6 +4,7 @@ import 'package:document_scanner/common/bloc/connectivity_bloc.dart';
 import 'package:document_scanner/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:document_scanner/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/upload_document_to_cloud_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/screens/folder_screen.dart';
 import 'package:document_scanner/features/documents/presentation/screens/images_screen.dart';
@@ -64,6 +65,9 @@ class _AppState extends State<App> {
             if (connectivityState is ConnectivitySuccess) {
               if (connectivityState.isConnectedToInternet) {
                 context
+                    .read<UploadDocumentToCloudBloc>()
+                    .add(UploadDocumentToCloudStarted());
+                context
                     .read<GetScannedDocumentsBloc>()
                     .add(GetScannedDocumentsStarted());
               } else {
@@ -71,6 +75,15 @@ class _AppState extends State<App> {
                     .read<GetScannedDocumentsBloc>()
                     .add(GetScannedDocumentsOfflineStarted());
               }
+            }
+          },
+        ),
+        BlocListener<UploadDocumentToCloudBloc, UploadDocumentToCloudState>(
+          listener: (_, uploadToCloudState) {
+            if (uploadToCloudState is UploadDocumentToCloudSuccess) {
+              context
+                  .read<GetScannedDocumentsBloc>()
+                  .add(GetScannedDocumentsStarted());
             }
           },
         ),

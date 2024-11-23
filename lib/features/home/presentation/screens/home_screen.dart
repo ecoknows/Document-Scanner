@@ -1,5 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:document_scanner/features/auth/data/entities/document_model.dart';
+import 'package:document_scanner/features/documents/data/entities/document_model.dart';
 import 'package:document_scanner/features/home/presentation/widgets/key_features.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final documents = box.values.toList();
 
     for (var document in documents) {
-      print('HIVE: ${document.name}');
+      for (var image in document.images) {
+        print('HIVE: ${document.name} ${image.isUploaded}');
+      }
     }
   }
 

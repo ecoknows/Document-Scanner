@@ -2,14 +2,17 @@ import 'dart:io';
 
 import 'package:document_scanner/app.dart';
 import 'package:document_scanner/common/bloc/connectivity_bloc.dart';
-import 'package:document_scanner/features/auth/data/entities/document_model.dart';
+import 'package:document_scanner/features/documents/data/entities/document_model.dart';
 import 'package:document_scanner/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:document_scanner/features/documents/data/entities/image_model.dart';
+import 'package:document_scanner/features/documents/data/entities/pdf_model.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/create_image_folder_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_folder_images_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/image_preview_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/move_image_folder_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/rename_folder_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/upload_document_to_cloud_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_scanned_documents_bloc.dart';
 import 'package:document_scanner/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,6 +30,8 @@ Future<void> main() async {
 
   Hive
     ..init(directory.path)
+    ..registerAdapter(ImageModelAdapter())
+    ..registerAdapter(PdfModelAdapter())
     ..registerAdapter(DocumentModelAdapter());
 
   runApp(const Main());
@@ -48,6 +53,7 @@ class Main extends StatelessWidget {
         BlocProvider(create: (_) => GetFolderImagesBloc()),
         BlocProvider(create: (_) => ImagePreviewBloc()),
         BlocProvider(create: (_) => ConnectivityBloc()),
+        BlocProvider(create: (_) => UploadDocumentToCloudBloc()),
       ],
       child: const App(),
     );

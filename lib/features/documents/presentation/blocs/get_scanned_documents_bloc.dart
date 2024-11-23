@@ -8,8 +8,8 @@ import 'package:document_scanner/common/classes/get_scanned_document_offline.dar
 import 'package:document_scanner/common/classes/save_image_class.dart';
 import 'package:document_scanner/features/auth/core/services/cloud_firestore_services.dart';
 import 'package:document_scanner/features/auth/core/services/firebase_auth_services.dart';
-import 'package:document_scanner/features/auth/data/entities/document_model.dart';
-import 'package:document_scanner/features/documents/data/image_folder.dart';
+import 'package:document_scanner/features/documents/data/entities/document_model.dart';
+import 'package:document_scanner/features/documents/core/image_folder.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -45,12 +45,12 @@ class GetScannedDocumentsBloc
 
     for (var document in documents) {
       File image = await SaveFile.uint8ListToFile(
-        document.images.first,
+        document.images.first.bytes,
         "${document.name}.0.jpg",
       );
 
       File pdf = await SaveFile.uint8ListToFile(
-        document.pdf,
+        document.pdf.bytes,
         "${document.name}.pdf",
       );
 
@@ -63,9 +63,9 @@ class GetScannedDocumentsBloc
         ),
       );
 
-      for (var (index, bytes) in document.images.indexed) {
+      for (var (index, image) in document.images.indexed) {
         File convertedImage = await SaveFile.uint8ListToFile(
-          bytes,
+          image.bytes,
           "${document.name}.$index.jpg",
         );
 
@@ -100,8 +100,6 @@ class GetScannedDocumentsBloc
       final documentStorage = FirebaseStorage.instance.ref(documentsUserPath);
 
       GetScannedDocumentsInProgress();
-
-      EasyLoading.show();
 
       ListResult documentResult = await documentStorage.listAll();
 
@@ -144,7 +142,6 @@ class GetScannedDocumentsBloc
 
       List<ImageFolder> imageFolders = await _firestore.getImageFolder();
 
-      EasyLoading.dismiss();
       emit(GetScannedDocumentsSuccess(
         imageFolders: imageFolders,
         documents: documents,
@@ -213,22 +210,22 @@ class GetScannedDocumentsBloc
       List<File> images = List.from(currentState.images);
       List<String> imagesPath = List.from(currentState.imagesPath);
 
-      for (var (index, bytes) in event.document.images.indexed) {
+      for (var (index, image) in event.document.images.indexed) {
         images.add(
           await SaveFile.uint8ListToFile(
-            bytes,
+            image.bytes,
             "${event.document.name}.$index.jpg",
           ),
         );
       }
 
       File image = await SaveFile.uint8ListToFile(
-        event.document.images.first,
+        event.document.images.first.bytes,
         "${event.document.name}.0.jpg",
       );
 
       File pdf = await SaveFile.uint8ListToFile(
-        event.document.pdf,
+        event.document.pdf.bytes,
         "${event.document.name}.pdf",
       );
 

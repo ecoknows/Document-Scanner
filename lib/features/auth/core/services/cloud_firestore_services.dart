@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:document_scanner/features/documents/data/image_folder.dart';
+import 'package:document_scanner/features/documents/core/image_folder.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class CloudFirestoreService {

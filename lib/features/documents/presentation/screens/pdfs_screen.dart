@@ -3,7 +3,7 @@ import 'package:document_scanner/common/classes/get_scanned_document.dart';
 import 'package:document_scanner/common/classes/get_scanned_document_offline.dart';
 import 'package:document_scanner/common/classes/save_image_class.dart';
 import 'package:document_scanner/common/widgets/authenticated_appbar.dart';
-import 'package:document_scanner/features/auth/data/entities/document_model.dart';
+import 'package:document_scanner/features/documents/data/entities/document_model.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/screens/pdf_preview_screen.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +78,7 @@ class _DocumentsScreenState extends State<PdfsScreen> {
                         PdfPreviewScreen.name,
                         pathParameters: {
                           "pdfName": document.name,
-                          "pdfPath": "",
+                          "pdfPath": "null",
                           "isOffline": "no",
                         },
                       );

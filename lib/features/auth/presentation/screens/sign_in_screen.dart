@@ -7,6 +7,7 @@ import 'package:document_scanner/features/auth/core/exceptions/auth_execptions.d
 import 'package:document_scanner/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:document_scanner/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/upload_document_to_cloud_bloc.dart';
 import 'package:document_scanner/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -63,6 +64,10 @@ class _SignInScreenState extends State<SignInScreen> {
             duration: const Duration(seconds: 5),
             mobileSnackBarPosition: MobileSnackBarPosition.bottom,
           ).show(context);
+
+          context
+              .read<UploadDocumentToCloudBloc>()
+              .add(UploadDocumentToCloudStarted());
 
           context
               .read<GetScannedDocumentsBloc>()

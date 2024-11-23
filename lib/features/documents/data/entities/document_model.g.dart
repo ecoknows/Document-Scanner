@@ -18,8 +18,8 @@ class DocumentModelAdapter extends TypeAdapter<DocumentModel> {
     };
     return DocumentModel(
       name: fields[1] as String,
-      images: (fields[2] as List).cast<Uint8List>(),
-      pdf: fields[3] as Uint8List,
+      images: (fields[2] as List).cast<ImageModel>(),
+      pdf: fields[3] as PdfModel,
     );
   }
 

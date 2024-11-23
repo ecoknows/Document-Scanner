@@ -6,7 +6,9 @@ import 'package:bloc/bloc.dart';
 import 'package:document_scanner/common/classes/get_scanned_document.dart';
 import 'package:document_scanner/common/classes/save_image_class.dart';
 import 'package:document_scanner/features/auth/core/services/firebase_auth_services.dart';
-import 'package:document_scanner/features/auth/data/entities/document_model.dart';
+import 'package:document_scanner/features/documents/data/entities/document_model.dart';
+import 'package:document_scanner/features/documents/data/entities/image_model.dart';
+import 'package:document_scanner/features/documents/data/entities/pdf_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -40,12 +42,17 @@ class UploadScannedDocumentsBloc
 
     PdfDocument pdfDocument = PdfDocument();
 
-    List<Uint8List> images = [];
+    List<ImageModel> images = [];
 
     for (var (index, picture) in pictures.indexed) {
       Uint8List bytes = await File(picture).readAsBytes();
 
-      images.add(bytes);
+      images.add(
+        ImageModel(
+          bytes: bytes,
+          isUploaded: false,
+        ),
+      );
 
       PdfPage page = pdfDocument.pages.add();
 
@@ -66,7 +73,9 @@ class UploadScannedDocumentsBloc
     final File pdfFile =
         await SaveFile.bytesToFile(pdfInt, "$documentName.pdf");
 
-    Uint8List pdf = await pdfFile.readAsBytes();
+    Uint8List bytes = await pdfFile.readAsBytes();
+
+    PdfModel pdf = PdfModel(bytes: bytes, isUploaded: false);
 
     pdfDocument.dispose();
 

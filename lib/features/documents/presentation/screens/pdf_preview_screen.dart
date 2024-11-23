@@ -45,7 +45,7 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
       doc = await PDFDocument.fromURL(url);
 
       setState(() {});
-    } else if (widget.isOffline == "yes" && path.isNotEmpty) {
+    } else if (widget.isOffline == "yes" && path != "null") {
       doc = await PDFDocument.fromFile(
         File(
           path,
