@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:document_scanner/common/bloc/connectivity_bloc.dart';
 import 'package:document_scanner/common/classes/save_image_class.dart';
+import 'package:document_scanner/features/documents/core/date_helper.dart';
+import 'package:document_scanner/features/documents/core/string_helper.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/image_preview_bloc.dart';
 import 'package:flutter/material.dart';
@@ -44,137 +46,132 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
                 margin: const EdgeInsets.only(top: 20),
                 child: Column(
                   children: [
-                    InkWell(
-                      onTap: () async {
-                        ConnectivityState connectivityState =
-                            context.read<ConnectivityBloc>().state;
-
-                        if (connectivityState is ConnectivitySuccess) {
-                          if (connectivityState.isConnectedToInternet) {
-                            PdfDocument document = PdfDocument();
-
-                            PdfPage page = document.pages.add();
-
-                            final PdfImage image = PdfBitmap(
-                              await SaveFile.readImageDataFromNetwork(
-                                imagePreviewState.images[i],
-                              ),
-                            );
-
-                            page.graphics.drawImage(
-                              image,
-                              Rect.fromLTWH(
-                                0,
-                                0,
-                                page.size.width,
-                                page.size.height,
-                              ),
-                            );
-
-                            List<int> bytes = await document.save();
-
-                            SaveFile.saveAndLaunchFile(bytes,
-                                '${DateTime.now().millisecondsSinceEpoch}.pdf');
-
-                            document.dispose();
-                          } else if (connectivityState.isConnectedToInternet ==
-                              false) {
-                            PdfDocument document = PdfDocument();
-
-                            PdfPage page = document.pages.add();
-
-                            final PdfImage image = PdfBitmap(
-                              await File(imagePreviewState.images[i])
-                                  .readAsBytes(),
-                            );
-
-                            page.graphics.drawImage(
-                              image,
-                              Rect.fromLTWH(
-                                0,
-                                0,
-                                page.size.width,
-                                page.size.height,
-                              ),
-                            );
-
-                            List<int> bytes = await document.save();
-
-                            SaveFile.saveAndLaunchFile(bytes,
-                                '${DateTime.now().millisecondsSinceEpoch}.pdf');
-
-                            document.dispose();
-                          }
-                        }
-                      },
-                      child: const Center(
-                        child: Text(
-                          'Click this to download document',
-                          style: TextStyle(color: Colors.white),
+                    Text(
+                      DateHelper.timestampToReadableDate(
+                        StringHelper.getFileName(
+                          imagePreviewState.images[i],
                         ),
+                      ),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
-                    InkWell(
-                      onTap: () async {
-                        ConnectivityState connectivityState =
-                            context.read<ConnectivityBloc>().state;
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            ConnectivityState connectivityState =
+                                context.read<ConnectivityBloc>().state;
 
-                        if (connectivityState is ConnectivitySuccess) {
-                          if (connectivityState.isConnectedToInternet) {
-                            String imageStorageUrl =
-                                imagePreviewState.images[i];
+                            if (connectivityState is ConnectivitySuccess) {
+                              PdfDocument document = PdfDocument();
+                              PdfPage page = document.pages.add();
 
-                            AnimatedSnackBar.material(
-                              "Image saved to gallery.",
-                              type: AnimatedSnackBarType.success,
-                              duration: const Duration(seconds: 5),
-                              mobileSnackBarPosition:
-                                  MobileSnackBarPosition.bottom,
-                            ).show(context);
+                              final PdfImage image = PdfBitmap(
+                                connectivityState.isConnectedToInternet
+                                    ? await SaveFile.readImageDataFromNetwork(
+                                        imagePreviewState.images[i],
+                                      )
+                                    : await File(imagePreviewState.images[i])
+                                        .readAsBytes(),
+                              );
 
-                            final response =
-                                await http.get(Uri.parse(imageStorageUrl));
+                              page.graphics.drawImage(
+                                image,
+                                Rect.fromLTWH(
+                                    0, 0, page.size.width, page.size.height),
+                              );
 
-                            final Uint8List bytes = response.bodyBytes;
+                              List<int> bytes = await document.save();
+                              SaveFile.saveAndLaunchFile(bytes,
+                                  '${DateTime.now().millisecondsSinceEpoch}.pdf');
 
-                            await ImageGallerySaver.saveImage(
-                              bytes,
-                              quality: 60,
-                              name: DateTime.now()
-                                  .microsecondsSinceEpoch
-                                  .toString(),
-                            );
-                          } else if (connectivityState.isConnectedToInternet ==
-                              false) {
-                            String imagePath = imagePreviewState.images[i];
-
-                            AnimatedSnackBar.material(
-                              "Image saved to gallery.",
-                              type: AnimatedSnackBarType.success,
-                              duration: const Duration(seconds: 5),
-                              mobileSnackBarPosition:
-                                  MobileSnackBarPosition.bottom,
-                            ).show(context);
-
-                            final Uint8List bytes =
-                                await File(imagePath).readAsBytes();
-
-                            await ImageGallerySaver.saveImage(
-                              bytes,
-                              quality: 60,
-                              name: DateTime.now()
-                                  .microsecondsSinceEpoch
-                                  .toString(),
-                            );
-                          }
-                        }
-                      },
-                      child: const Center(
-                        child: Text(
-                          'Click this to save image to gallery',
-                          style: TextStyle(color: Colors.white),
+                              document.dispose();
+                            }
+                          },
+                          icon: const Icon(
+                            Icons.picture_as_pdf,
+                            size: 14,
+                          ),
+                          label: const Text(
+                            "Save PDF",
+                            style: TextStyle(fontSize: 14),
+                          ),
                         ),
-                      ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            ConnectivityState connectivityState =
+                                context.read<ConnectivityBloc>().state;
+
+                            if (connectivityState is ConnectivitySuccess) {
+                              String imagePath =
+                                  connectivityState.isConnectedToInternet
+                                      ? imagePreviewState.images[i]
+                                      : await File(imagePreviewState.images[i])
+                                          .path;
+
+                              final Uint8List bytes =
+                                  connectivityState.isConnectedToInternet
+                                      ? (await http.get(Uri.parse(imagePath)))
+                                          .bodyBytes
+                                      : await File(imagePath).readAsBytes();
+
+                              await ImageGallerySaver.saveImage(
+                                bytes,
+                                quality: 60,
+                                name: DateTime.now()
+                                    .microsecondsSinceEpoch
+                                    .toString(),
+                              );
+
+                              AnimatedSnackBar.material(
+                                "Image saved to gallery.",
+                                type: AnimatedSnackBarType.success,
+                                duration: const Duration(seconds: 5),
+                                mobileSnackBarPosition:
+                                    MobileSnackBarPosition.bottom,
+                              ).show(context);
+                            }
+                          },
+                          icon: const Icon(
+                            Icons.photo,
+                            size: 14,
+                          ),
+                          label: const Text(
+                            "Save Image",
+                            style: TextStyle(
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            // Add your delete logic here
+                            print("Image deleted!");
+                          },
+                          icon: const Icon(
+                            Icons.delete,
+                            size: 14,
+                          ),
+                          label: const Text(
+                            "Delete",
+                            style: TextStyle(
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

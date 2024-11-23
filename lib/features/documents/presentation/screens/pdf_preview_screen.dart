@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:document_scanner/base/widgets/base_scaffold.dart';
 import 'package:document_scanner/common/widgets/authenticated_appbar.dart';
 import 'package:document_scanner/features/auth/core/services/firebase_auth_services.dart';
+import 'package:document_scanner/features/documents/core/date_helper.dart';
+import 'package:document_scanner/features/documents/core/string_helper.dart';
 import 'package:easy_pdf_viewer/easy_pdf_viewer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -67,7 +69,22 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
 
     if (document != null) {
       return BaseScaffold(
-        appBar: AuthenticatedAppBar(title: "${widget.pdfName}.pdf"),
+        appBar: AuthenticatedAppBar(
+          title: "",
+          customizeAppBar: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("PDF Viewer"),
+              Text(
+                DateHelper.timestampToReadableDate(
+                  widget.pdfName,
+                ),
+                style: const TextStyle(fontSize: 13),
+              ),
+            ],
+          ),
+        ),
         body: Center(
           child: PDFViewer(document: document),
         ),

@@ -17,10 +17,13 @@ class AuthenticatedAppBar extends StatelessWidget
   final String? title;
   final Widget? primaryWidget;
 
+  final Widget? customizeAppBar;
+
   const AuthenticatedAppBar({
     super.key,
     required this.title,
     this.primaryWidget,
+    this.customizeAppBar,
   });
 
   @override
@@ -36,28 +39,29 @@ class AuthenticatedAppBar extends StatelessWidget
           return Container();
         }
         return BaseAppBar(
-          title: appTitle != null && appTitle != HomeScreen.name
-              ? Text(appTitle)
-              : Row(
-                  children: [
-                    Image.asset(
-                      'assets/images/logo.jpg', // Path to your logo image
-                      height: 40, // Adjust height as needed
-                    ),
-                    const SizedBox(
-                      width: 8,
-                    ), // Add spacing between the logo and title
-                    Expanded(
-                      child: Text(
-                        "MOBILE DOCUMENT \nSCANNER APP FOR PSU",
-                        maxLines: 2,
-                        overflow: TextOverflow.visible,
-                        softWrap: true,
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ),
-                  ],
-                ),
+          title: customizeAppBar ??
+              (appTitle != null && appTitle != HomeScreen.name
+                  ? Text(appTitle)
+                  : Row(
+                      children: [
+                        Image.asset(
+                          'assets/images/logo.jpg', // Path to your logo image
+                          height: 40, // Adjust height as needed
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ), // Add spacing between the logo and title
+                        Expanded(
+                          child: Text(
+                            "MOBILE DOCUMENT \nSCANNER APP FOR PSU",
+                            maxLines: 2,
+                            overflow: TextOverflow.visible,
+                            softWrap: true,
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                      ],
+                    )),
           actions: [
             if (primary != null) primary,
             if (currentUser != null && photoUrl != null)
@@ -88,7 +92,7 @@ class AuthenticatedAppBar extends StatelessWidget
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           child: const Text(
-                            'Offline Mode',
+                            'Offline',
                             style: TextStyle(
                               color: Colors.orange, // Text color
                               fontWeight: FontWeight.bold,
@@ -113,20 +117,24 @@ class AuthenticatedAppBar extends StatelessWidget
                 onSelected: (value) {
                   switch (value) {
                     case "settings":
+                      context.goNamed(HomeScreen.name);
                       context.pushNamed(SettingsScreen.name);
                       break;
                     case "images":
+                      context.goNamed(HomeScreen.name);
                       context.pushNamed(ImagesScreen.name);
                       break;
                     case "pdfs":
+                      context.goNamed(HomeScreen.name);
                       context.pushNamed(PdfsScreen.name);
                       break;
                     case "my-profile":
+                      context.goNamed(HomeScreen.name);
                       context.pushNamed(ProfileScreen.name);
                       break;
                     case "logout":
                       context.read<AuthBloc>().add(SignOutUserStarted());
-                      context.pushNamed(SignInScreen.name);
+                      context.goNamed(SignInScreen.name);
                       break;
                   }
                 },
