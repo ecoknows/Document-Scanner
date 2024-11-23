@@ -64,81 +64,81 @@ class AuthenticatedAppBar extends StatelessWidget
                     )),
           actions: [
             if (primary != null) primary,
-            if (currentUser != null && photoUrl != null)
-              PopupMenuButton(
-                position: PopupMenuPosition.under,
-                constraints: BoxConstraints(
-                  minWidth: 132,
-                  maxWidth: MediaQuery.of(context).size.width,
-                ),
-                tooltip: 'Menu',
-                surfaceTintColor: Colors.white,
-                color: Colors.white,
-                icon: Row(
-                  children: [
-                    if (connectivtyState.isConnectedToInternet == false)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color:
-                                Colors.orange[50], // Slight orange background
-                            border: Border.all(
-                              color: Colors.orange, // Orange stroke
-                            ),
-                            borderRadius:
-                                BorderRadius.circular(20), // Oblong corners
+            PopupMenuButton(
+              position: PopupMenuPosition.under,
+              constraints: BoxConstraints(
+                minWidth: 132,
+                maxWidth: MediaQuery.of(context).size.width,
+              ),
+              tooltip: 'Menu',
+              surfaceTintColor: Colors.white,
+              color: Colors.white,
+              icon: Row(
+                children: [
+                  if (connectivtyState.isConnectedToInternet == false)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.orange[50], // Slight orange background
+                          border: Border.all(
+                            color: Colors.orange, // Orange stroke
                           ),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
-                          child: const Text(
-                            'Offline',
-                            style: TextStyle(
-                              color: Colors.orange, // Text color
-                              fontWeight: FontWeight.bold,
-                            ),
+                          borderRadius:
+                              BorderRadius.circular(20), // Oblong corners
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        child: const Text(
+                          'Offline',
+                          style: TextStyle(
+                            color: Colors.orange, // Text color
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    if (connectivtyState.isConnectedToInternet == true)
-                      Center(
-                        child: CircleAvatar(
-                          backgroundColor: Colors.transparent,
-                          backgroundImage: NetworkImage(photoUrl),
-                          radius: 15.0,
-                        ),
-                      ),
-                    const Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 16.0,
                     ),
-                  ],
-                ),
-                onSelected: (value) {
-                  switch (value) {
-                    case "settings":
-                      context.goNamed(HomeScreen.name);
-                      context.pushNamed(SettingsScreen.name);
-                      break;
-                    case "images":
-                      context.goNamed(HomeScreen.name);
-                      context.pushNamed(ImagesScreen.name);
-                      break;
-                    case "pdfs":
-                      context.goNamed(HomeScreen.name);
-                      context.pushNamed(PdfsScreen.name);
-                      break;
-                    case "my-profile":
-                      context.goNamed(HomeScreen.name);
-                      context.pushNamed(ProfileScreen.name);
-                      break;
-                    case "logout":
-                      context.read<AuthBloc>().add(SignOutUserStarted());
-                      context.goNamed(SignInScreen.name);
-                      break;
-                  }
-                },
-                itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                  if (connectivtyState.isConnectedToInternet == true &&
+                      photoUrl != null)
+                    Center(
+                      child: CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        backgroundImage: NetworkImage(photoUrl),
+                        radius: 15.0,
+                      ),
+                    ),
+                  const Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 16.0,
+                  ),
+                ],
+              ),
+              onSelected: (value) {
+                switch (value) {
+                  case "settings":
+                    context.goNamed(HomeScreen.name);
+                    context.pushNamed(SettingsScreen.name);
+                    break;
+                  case "images":
+                    context.goNamed(HomeScreen.name);
+                    context.pushNamed(ImagesScreen.name);
+                    break;
+                  case "pdfs":
+                    context.goNamed(HomeScreen.name);
+                    context.pushNamed(PdfsScreen.name);
+                    break;
+                  case "my-profile":
+                    context.goNamed(HomeScreen.name);
+                    context.pushNamed(ProfileScreen.name);
+                    break;
+                  case "logout":
+                    context.read<AuthBloc>().add(SignOutUserStarted());
+                    context.goNamed(SignInScreen.name);
+                    break;
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+                if (currentUser != null) ...[
                   const PopupMenuItem(
                     value: "my-profile",
                     height: 0,
@@ -154,58 +154,60 @@ class AuthenticatedAppBar extends StatelessWidget
                             fontSize: 14)),
                   ),
                   const PopupMenuDivider(),
-                  const PopupMenuItem(
-                    value: "images",
-                    height: 0,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: Text(
-                      'Images',
-                      style: TextStyle(
-                        fontFamily: 'OpenSauceTwo',
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                        fontSize: 14,
-                      ),
+                ],
+                const PopupMenuItem(
+                  value: "images",
+                  height: 0,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Text(
+                    'Images',
+                    style: TextStyle(
+                      fontFamily: 'OpenSauceTwo',
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                      fontSize: 14,
                     ),
                   ),
-                  const PopupMenuItem(
-                    value: "pdfs",
-                    height: 0,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: Text(
-                      "PDF's",
-                      style: TextStyle(
-                        fontFamily: 'OpenSauceTwo',
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                        fontSize: 14,
-                      ),
+                ),
+                const PopupMenuItem(
+                  value: "pdfs",
+                  height: 0,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Text(
+                    "PDF's",
+                    style: TextStyle(
+                      fontFamily: 'OpenSauceTwo',
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                      fontSize: 14,
                     ),
                   ),
-                  const PopupMenuDivider(),
-                  const PopupMenuItem(
-                    value: "settings",
-                    height: 0,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: Text(
-                      'Settings',
-                      style: TextStyle(
-                        fontFamily: 'OpenSauceTwo',
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                        fontSize: 14,
-                      ),
+                ),
+                const PopupMenuDivider(),
+                const PopupMenuItem(
+                  value: "settings",
+                  height: 0,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Text(
+                    'Settings',
+                    style: TextStyle(
+                      fontFamily: 'OpenSauceTwo',
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                      fontSize: 14,
                     ),
                   ),
+                ),
+                if (currentUser != null) ...[
                   const PopupMenuDivider(),
                   const PopupMenuItem(
                     value: "logout",
@@ -223,9 +225,10 @@ class AuthenticatedAppBar extends StatelessWidget
                         fontSize: 14,
                       ),
                     ),
-                  ),
+                  )
                 ],
-              )
+              ],
+            )
           ],
         );
       },

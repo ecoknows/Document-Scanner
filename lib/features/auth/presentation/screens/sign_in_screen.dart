@@ -71,7 +71,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
           context
               .read<GetScannedDocumentsBloc>()
-              .add(GetScannedDocumentsStarted());
+              .add(GetScannedDocumentsStarted(showLoadingIndicator: true));
 
           context.goNamed(HomeScreen.name);
         } else if (authState is AuthFail) {
@@ -149,7 +149,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            context.goNamed(SignUpScreen.name);
+                            context.pushNamed(SignUpScreen.name);
                           },
                       ),
                     ],

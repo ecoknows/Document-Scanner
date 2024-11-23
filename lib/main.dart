@@ -7,10 +7,12 @@ import 'package:document_scanner/features/auth/presentation/blocs/auth_bloc.dart
 import 'package:document_scanner/features/documents/data/entities/image_model.dart';
 import 'package:document_scanner/features/documents/data/entities/pdf_model.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/create_image_folder_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/delete_document_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_folder_images_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/image_preview_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/move_image_folder_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/pdf_preview_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/rename_folder_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_document_to_cloud_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_scanned_documents_bloc.dart';
@@ -54,6 +56,8 @@ class Main extends StatelessWidget {
         BlocProvider(create: (_) => ImagePreviewBloc()),
         BlocProvider(create: (_) => ConnectivityBloc()),
         BlocProvider(create: (_) => UploadDocumentToCloudBloc()),
+        BlocProvider(create: (_) => DeleteDocumentBloc()),
+        BlocProvider(create: (_) => PdfPreviewBloc()),
       ],
       child: const App(),
     );

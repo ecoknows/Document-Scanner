@@ -1,26 +1,23 @@
 import 'dart:typed_data';
 
-import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 
 part 'image_model.g.dart';
 
 @HiveType(typeId: 1)
-class ImageModel extends Equatable {
+class ImageModel extends HiveObject {
   ImageModel({
-    required this.bytes,
+    required this.name,
     required this.isUploaded,
+    required this.bytes,
   });
 
   @HiveField(1)
-  final Uint8List bytes;
+  final String name;
 
   @HiveField(2)
   bool isUploaded;
 
-  @override
-  List<Object?> get props => [
-        bytes,
-        isUploaded,
-      ];
+  @HiveField(3)
+  final Uint8List bytes;
 }

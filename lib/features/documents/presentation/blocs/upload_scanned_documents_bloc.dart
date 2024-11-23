@@ -49,6 +49,7 @@ class UploadScannedDocumentsBloc
 
       images.add(
         ImageModel(
+          name: "$documentName.$index.jpg",
           bytes: bytes,
           isUploaded: false,
         ),
@@ -75,7 +76,12 @@ class UploadScannedDocumentsBloc
 
     Uint8List bytes = await pdfFile.readAsBytes();
 
-    PdfModel pdf = PdfModel(bytes: bytes, isUploaded: false);
+    PdfModel pdf = PdfModel(
+      name: "$documentName.pdf",
+      imageBytes: images.first.bytes,
+      bytes: bytes,
+      isUploaded: false,
+    );
 
     pdfDocument.dispose();
 
@@ -110,6 +116,7 @@ class UploadScannedDocumentsBloc
 
       final List<GetScannedDocument> documents = [];
       final List<String> images = [];
+      final List<String> imagesFilename = [];
       final List<String> pdfs = [];
 
       PdfDocument pdfDocument = PdfDocument();
@@ -118,7 +125,10 @@ class UploadScannedDocumentsBloc
         final File image = File(picture);
         UploadTask? uploadImagesTask;
 
-        final String imagePath = "$imageUserPath/$documentName.$index.jpg";
+        final String imageName = "$documentName.$index.jpg";
+        imagesFilename.add(imageName);
+
+        final String imagePath = "$imageUserPath/$imageName";
 
         final imageStorage = storageRef.child(imagePath);
 
@@ -156,6 +166,32 @@ class UploadScannedDocumentsBloc
         );
       }
 
+      // PDF Image Process
+      UploadTask? uploadPdfImagesTask;
+      final String pdfImageUserPath = "pdf/scanned_image/${user.uid}";
+      final String pdfImagePath = "$pdfImageUserPath/$documentName.jpg";
+      final pdfImageRef = storageRef.child(pdfImagePath);
+
+      String pdfImageFilePath = pictures.first;
+      final File pdfImage = File(pdfImageFilePath);
+      uploadPdfImagesTask = pdfImageRef.putFile(pdfImage);
+
+      uploadPdfImagesTask.snapshotEvents.listen((event) {
+        double progress =
+            event.bytesTransferred.toDouble() / event.totalBytes.toDouble();
+        EasyLoading.showProgress(progress,
+            status: '${(progress * 100).round()}%');
+      }).onError((error) {
+        throw Exception('Something went wrong uploading image.');
+      });
+
+      TaskSnapshot imagePdfSnapshot =
+          await uploadPdfImagesTask.whenComplete(() async {
+        EasyLoading.dismiss();
+      });
+
+      var imagePdfDownloadUrl = await imagePdfSnapshot.ref.getDownloadURL();
+
       // PDF Process
       final String pdfUserPath = "pdf/scanned_documents/${user.uid}";
       final String pdfPath = "$pdfUserPath/$documentName.pdf";
@@ -189,7 +225,7 @@ class UploadScannedDocumentsBloc
 
       documents.add(GetScannedDocument(
         name: documentName,
-        image: images.first,
+        image: imagePdfDownloadUrl,
         pdf: pdfDownloadUrl,
       ));
 
@@ -197,6 +233,7 @@ class UploadScannedDocumentsBloc
         UploadScannedDocumentsSuccess(
           documents: documents,
           images: images,
+          imagesFilename: imagesFilename,
           pdfs: pdfs,
         ),
       );

@@ -1,15 +1,12 @@
-import 'dart:typed_data';
-
 import 'package:document_scanner/features/documents/data/entities/image_model.dart';
 import 'package:document_scanner/features/documents/data/entities/pdf_model.dart';
-import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
 
 part 'document_model.g.dart';
 
 @HiveType(typeId: 0)
-class DocumentModel extends Equatable {
-  const DocumentModel({
+class DocumentModel extends HiveObject {
+  DocumentModel({
     required this.name,
     required this.images,
     required this.pdf,
@@ -19,7 +16,7 @@ class DocumentModel extends Equatable {
   final String name;
 
   @HiveField(2)
-  final List<ImageModel> images;
+  List<ImageModel> images;
 
   @HiveField(3)
   final PdfModel pdf;
@@ -35,11 +32,4 @@ class DocumentModel extends Equatable {
       pdf: pdf ?? this.pdf,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        name,
-        images,
-        pdf,
-      ];
 }

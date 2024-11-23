@@ -66,11 +66,8 @@ class UploadDocumentToCloudBloc
           });
 
           await uploadImagesTask.whenComplete(() async {
-            final documentToBeUpdated = document.copyWith();
-
-            documentToBeUpdated.images[index].isUploaded = true;
-
-            box.putAt(documentIndex, documentToBeUpdated);
+            document.images[index].isUploaded = true;
+            document.save();
             EasyLoading.dismiss();
           });
         }
@@ -78,6 +75,30 @@ class UploadDocumentToCloudBloc
         if (document.pdf.isUploaded) {
           continue;
         }
+
+        // PDF Image Process
+        UploadTask? uploadPdfImagesTask;
+        final String pdfImageUserPath = "pdf/scanned_image/${user.uid}";
+        final String pdfImagePath = "$pdfImageUserPath/${document.name}.jpg";
+        final pdfImageRef = storageRef.child(pdfImagePath);
+
+        final File pdfImage = await SaveFile.uint8ListToFile(
+          document.images.first.bytes,
+          "${document.name}.jpg",
+        );
+        uploadPdfImagesTask = pdfImageRef.putFile(pdfImage);
+
+        uploadPdfImagesTask.snapshotEvents.listen((event) {
+          double progress =
+              event.bytesTransferred.toDouble() / event.totalBytes.toDouble();
+          EasyLoading.showProgress(progress,
+              status: '${(progress * 100).round()}%');
+        }).onError((error) {
+          throw Exception('Something went wrong uploading image.');
+        });
+        await uploadPdfImagesTask.whenComplete(() async {
+          EasyLoading.dismiss();
+        });
 
         final String pdfName = "${document.name}.pdf";
         final File pdfFile =
@@ -101,11 +122,8 @@ class UploadDocumentToCloudBloc
         });
 
         await pdfUploadTask.whenComplete(() {
-          final documentToBeUpdated = document.copyWith();
-
-          documentToBeUpdated.pdf.isUploaded = true;
-
-          box.putAt(documentIndex, documentToBeUpdated);
+          document.pdf.isUploaded = true;
+          document.save();
           EasyLoading.dismiss();
         });
       }

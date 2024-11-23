@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:document_scanner/common/classes/get_scanned_document.dart';
+import 'package:document_scanner/common/classes/get_scanned_document_offline.dart';
+import 'package:document_scanner/features/documents/data/entities/document_model.dart';
 import 'package:equatable/equatable.dart';
 
 part 'image_preview_event.dart';
@@ -17,7 +20,10 @@ class ImagePreviewBloc extends Bloc<ImagePreviewEvent, ImagePreviewState> {
     Emitter<ImagePreviewState> emit,
   ) {
     emit(ImagePreviewInProgress());
-    emit(ImagePreviewSuccess(images: event.images));
+    emit(ImagePreviewSuccess(
+      images: event.images,
+      imagesFilename: event.imagesFilename,
+    ));
   }
 
   void _imagePreviewOffline(
@@ -25,6 +31,11 @@ class ImagePreviewBloc extends Bloc<ImagePreviewEvent, ImagePreviewState> {
     Emitter<ImagePreviewState> emit,
   ) {
     emit(ImagePreviewInProgress());
-    emit(ImagePreviewOfflineSuccess(images: event.images));
+    emit(
+      ImagePreviewOfflineSuccess(
+        images: event.images,
+        documents: event.documents,
+      ),
+    );
   }
 }

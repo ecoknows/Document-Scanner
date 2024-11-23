@@ -16,11 +16,13 @@ final class UploadScannedDocumentsInProgress
 final class UploadScannedDocumentsSuccess extends UploadScannedDocumentsState {
   final List<GetScannedDocument> documents;
   final List<String> images;
+  final List<String> imagesFilename;
   final List<String> pdfs;
 
   UploadScannedDocumentsSuccess({
     required this.documents,
     required this.images,
+    required this.imagesFilename,
     required this.pdfs,
   });
 

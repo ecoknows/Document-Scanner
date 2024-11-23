@@ -1,7 +1,7 @@
 name: "document_scanner"
 description: "Document Scanner"
 publish_to: 'none'
-version: 0.3.4
+version: 1.0.0
 
 environment:
   sdk: '>=3.3.3 <4.0.0'
@@ -38,6 +38,7 @@ dependencies:
   open_file: ^3.3.2
   path: ^1.9.0
   path_provider: ^2.1.2
+  share_plus: ^10.0.0
   syncfusion_flutter_pdf: ^25.1.42
   youtube_player_flutter: ^9.0.1
 

@@ -34,6 +34,7 @@ class ImagesScreen extends StatefulWidget {
 class _DocumentsScreenState extends State<ImagesScreen> {
   bool isSelected = false;
   List<String> selectedImages = [];
+  List<String> selectedImagesFilename = [];
 
   @override
   void initState() {
@@ -56,6 +57,7 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                     onPressed: () {
                       setState(() {
                         selectedImages = [];
+                        selectedImagesFilename = [];
                         isSelected = !isSelected;
                       });
                     },
@@ -84,18 +86,16 @@ class _DocumentsScreenState extends State<ImagesScreen> {
               BlocListener<CreateImageFolderBloc, CreateImageFolderState>(
                 listener: (context, state) {
                   if (state is CreateImageFolderSuccess) {
-                    context
-                        .read<GetScannedDocumentsBloc>()
-                        .add(GetScannedDocumentsStarted());
+                    context.read<GetScannedDocumentsBloc>().add(
+                        GetScannedDocumentsStarted(showLoadingIndicator: true));
                   }
                 },
               ),
               BlocListener<MoveImageFolderBloc, MoveImageFolderState>(
                 listener: (context, state) {
                   if (state is MoveImageFolderSuccess) {
-                    context
-                        .read<GetScannedDocumentsBloc>()
-                        .add(GetScannedDocumentsStarted());
+                    context.read<GetScannedDocumentsBloc>().add(
+                        GetScannedDocumentsStarted(showLoadingIndicator: true));
                   }
                 },
               ),
@@ -107,6 +107,8 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                   List<GetScannedDocument> documents =
                       getScannedDocumentsState.documents;
                   List<String> images = getScannedDocumentsState.images;
+                  List<String> imagesFilename =
+                      getScannedDocumentsState.imagesFilename;
                   List<ImageFolder> folders =
                       getScannedDocumentsState.imageFolders;
 
@@ -147,6 +149,7 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                               context.read<GetScannedDocumentsBloc>().add(
                                     RemoveImagesStarted(
                                       images: selectedImages,
+                                      imagesFilename: selectedImagesFilename,
                                     ),
                                   );
                               context.read<MoveImageFolderBloc>().add(
@@ -158,6 +161,7 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                                   );
                               setState(() {
                                 selectedImages = [];
+                                selectedImagesFilename = [];
                                 isSelected = !isSelected;
                               });
                             } else {
@@ -191,7 +195,10 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                           onTap: () {
                             if (isSelected == false) {
                               context.read<ImagePreviewBloc>().add(
-                                    ImagePreviewStarted(images: images),
+                                    ImagePreviewStarted(
+                                      images: images,
+                                      imagesFilename: imagesFilename,
+                                    ),
                                   );
                               context.pushNamed(
                                 ImagePreviewScreen.name,
@@ -203,8 +210,12 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                               setState(() {
                                 if (!selectedImages.contains(image)) {
                                   selectedImages.add(image);
+                                  selectedImagesFilename
+                                      .add(imagesFilename[index]);
                                 } else {
                                   selectedImages.remove(image);
+                                  selectedImagesFilename
+                                      .remove(imagesFilename[index]);
                                 }
                               });
                             }
@@ -247,13 +258,12 @@ class _DocumentsScreenState extends State<ImagesScreen> {
 
                 if (getScannedDocumentsState
                     is GetScannedDocumentsOfflineSuccess) {
+                  List<File> images = getScannedDocumentsState.images;
                   List<GetScannedDocumentOffline> documents =
                       getScannedDocumentsState.documents;
-
-                  List<File> images = getScannedDocumentsState.images;
                   List<String> imagesPath = getScannedDocumentsState.imagesPath;
 
-                  if (documents.isEmpty) {
+                  if (images.isEmpty) {
                     return Center(
                       child: Column(
                         children: [
@@ -261,7 +271,7 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                             height: 100.0,
                           ),
                           const Icon(
-                            Icons.document_scanner,
+                            Icons.image,
                             color: Colors.black,
                             size: 100.0,
                           ),
@@ -269,7 +279,7 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                             height: 16.0,
                           ),
                           Text(
-                            "No documents found",
+                            "No image found",
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ],
@@ -287,7 +297,10 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                         InkWell(
                           onTap: () {
                             context.read<ImagePreviewBloc>().add(
-                                  ImagePreviewStarted(images: imagesPath),
+                                  ImagePreviewOfflineStarted(
+                                    images: imagesPath,
+                                    documents: documents,
+                                  ),
                                 );
                             context.pushNamed(
                               ImagePreviewScreen.name,
@@ -347,7 +360,7 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                         height: 16.0,
                       ),
                       Text(
-                        "No documents found",
+                        "No images found",
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:bloc/bloc.dart';
 import 'package:document_scanner/common/classes/firebase_helpers.dart';
@@ -36,6 +35,10 @@ class GetScannedDocumentsBloc
     GetScannedDocumentsOfflineStarted event,
     Emitter<GetScannedDocumentsState> emit,
   ) async {
+    if (event.showLoadingIndicator) {
+      EasyLoading.show();
+    }
+
     final box = await Hive.openBox<DocumentModel>('documentsBox');
 
     final documents = box.values.toList();
@@ -45,8 +48,8 @@ class GetScannedDocumentsBloc
 
     for (var document in documents) {
       File image = await SaveFile.uint8ListToFile(
-        document.images.first.bytes,
-        "${document.name}.0.jpg",
+        document.pdf.imageBytes,
+        "${document.name}.jpg",
       );
 
       File pdf = await SaveFile.uint8ListToFile(
@@ -81,6 +84,10 @@ class GetScannedDocumentsBloc
         imagesPath: imagesPath,
       ),
     );
+
+    if (event.showLoadingIndicator) {
+      EasyLoading.dismiss();
+    }
   }
 
   void _getScannedDocuments(
@@ -89,13 +96,19 @@ class GetScannedDocumentsBloc
   ) async {
     User? user = _auth.auth.currentUser;
 
+    if (event.showLoadingIndicator) {
+      EasyLoading.show();
+    }
+
     if (user != null) {
       final List<GetScannedDocument> documents = [];
       final List<String> images = [];
+      final List<String> imagesFilename = [];
       final List<String> pdfs = [];
 
       final String documentsUserPath = "images/scanned_documents/${user.uid}";
       final String pdfsUserPath = "pdf/scanned_documents/${user.uid}";
+      final String pdfImagesUserPath = "pdf/scanned_image/${user.uid}";
 
       final documentStorage = FirebaseStorage.instance.ref(documentsUserPath);
 
@@ -110,6 +123,7 @@ class GetScannedDocumentsBloc
           if (!imageRef.name.contains("moved")) {
             final imageUrl = await imageRef.getDownloadURL();
             images.add(imageUrl);
+            imagesFilename.add(imageRef.name);
           }
         }
       }
@@ -121,18 +135,13 @@ class GetScannedDocumentsBloc
         final pdfUrl = await pdfRef.getDownloadURL();
         final pdfName = pdfRef.name.split(".").first;
 
-        final imagePath = "$documentsUserPath/$pdfName/$pdfName.0.jpg";
+        final imagePath = "$pdfImagesUserPath/$pdfName.jpg";
         final imageDownload =
             await FirebaseHelpers.getDownloadUrlIfExists(imagePath);
 
-        final imagePathMoved =
-            "$documentsUserPath/$pdfName/$pdfName.0.moved.jpg";
-        final imageMovedDownload =
-            await FirebaseHelpers.getDownloadUrlIfExists(imagePathMoved);
-
         final document = GetScannedDocument(
           name: pdfRef.name.split(".").first,
-          image: imageDownload ?? imageMovedDownload!,
+          image: imageDownload!,
           pdf: pdfUrl,
         );
 
@@ -146,10 +155,15 @@ class GetScannedDocumentsBloc
         imageFolders: imageFolders,
         documents: documents,
         images: images,
+        imagesFilename: imagesFilename,
         pdfs: pdfs,
       ));
     } else {
       emit(GetScannedDocumentsFail(message: "User not found."));
+    }
+
+    if (event.showLoadingIndicator) {
+      EasyLoading.dismiss();
     }
   }
 
@@ -163,16 +177,19 @@ class GetScannedDocumentsBloc
       List<ImageFolder> imageFolders = List.from(currentState.imageFolders);
       List<GetScannedDocument> documents = List.from(currentState.documents);
       List<String> images = List.from(currentState.images);
+      List<String> imagesFilename = List.from(currentState.imagesFilename);
       List<String> pdfs = List.from(currentState.pdfs);
 
       documents.addAll(event.documents);
       images.addAll(event.images);
+      imagesFilename.addAll(event.imagesFilename);
       pdfs.addAll(event.pdfs);
 
       emit(GetScannedDocumentsSuccess(
         imageFolders: imageFolders,
         documents: documents,
         images: images,
+        imagesFilename: imagesFilename,
         pdfs: pdfs,
       ));
     }
@@ -186,13 +203,17 @@ class GetScannedDocumentsBloc
 
     if (currentState is GetScannedDocumentsSuccess) {
       List<String> images = List.from(currentState.images);
+      List<String> imagesFilename = List.from(currentState.imagesFilename);
 
       images.removeWhere((element) => event.images.contains(element));
+      imagesFilename
+          .removeWhere((element) => event.imagesFilename.contains(element));
 
       emit(GetScannedDocumentsSuccess(
         imageFolders: currentState.imageFolders,
         documents: currentState.documents,
         images: images,
+        imagesFilename: imagesFilename,
         pdfs: currentState.pdfs,
       ));
     }

@@ -47,7 +47,7 @@ class _FolderScreenState extends State<FolderScreen> {
         if (state is RenameFolderSuccess) {
           context
               .read<GetScannedDocumentsBloc>()
-              .add(GetScannedDocumentsStarted());
+              .add(GetScannedDocumentsStarted(showLoadingIndicator: true));
         }
       },
       child: BaseScaffold(
@@ -70,6 +70,7 @@ class _FolderScreenState extends State<FolderScreen> {
           builder: (context, getFolderImageState) {
             if (getFolderImageState is GetFolderImagesSuccess) {
               List<String> images = getFolderImageState.images;
+              List<String> imagesFilename = getFolderImageState.imagesFilename;
 
               if (images.isEmpty) {
                 return Center(
@@ -105,7 +106,10 @@ class _FolderScreenState extends State<FolderScreen> {
                     InkWell(
                       onTap: () {
                         context.read<ImagePreviewBloc>().add(
-                              ImagePreviewStarted(images: images),
+                              ImagePreviewStarted(
+                                images: images,
+                                imagesFilename: imagesFilename,
+                              ),
                             );
                         context.pushNamed(
                           ImagePreviewScreen.name,

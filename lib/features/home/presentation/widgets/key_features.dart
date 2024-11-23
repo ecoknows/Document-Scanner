@@ -84,25 +84,6 @@ class KeyFeatures extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(
-            height: 8.0,
-          ),
-          Row(
-            children: [
-              const Icon(
-                Icons.picture_as_pdf,
-                size: 30.0,
-              ),
-              const SizedBox(
-                width: 4.0,
-              ),
-              Text(
-                "Unlimited document scan.",
-                style: Theme.of(context).textTheme.labelSmall,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          )
         ],
       ),
     );

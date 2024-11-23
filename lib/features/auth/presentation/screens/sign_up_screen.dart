@@ -78,168 +78,138 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() {
       pickedFile = result.files.first;
     });
+
+    _checkIfValid();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (context, authState) {
-        if (authState is AuthSuccess) {
-          AnimatedSnackBar.material(
-            authState.message,
-            type: AnimatedSnackBarType.success,
-            duration: const Duration(seconds: 5),
-            mobileSnackBarPosition: MobileSnackBarPosition.bottom,
-          ).show(context);
-
-          context
-              .read<UploadDocumentToCloudBloc>()
-              .add(UploadDocumentToCloudStarted());
-
-          context
-              .read<GetScannedDocumentsBloc>()
-              .add(GetScannedDocumentsStarted());
-
-          context.goNamed(HomeScreen.name);
-        } else if (authState is AuthFail) {
-          AuthException e = authState.exception;
-
-          AnimatedSnackBar.material(
-            e.message,
-            type: AnimatedSnackBarType.error,
-            duration: const Duration(seconds: 5),
-            mobileSnackBarPosition: MobileSnackBarPosition.bottom,
-          ).show(context);
-        }
-      },
-      child: BaseScaffold(
-        appBar: BaseAppBar(
-          title: Text(SignInScreen.name),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 16,
-                ),
-                if (pickedFile != null)
-                  Center(
-                    child: InkWell(
-                      onTap: selectFile,
-                      child: CircleAvatar(
-                        backgroundColor: Colors.transparent,
-                        radius: 80.0,
-                        backgroundImage: FileImage(File(pickedFile!.path!)),
-                      ),
-                    ),
-                  ),
-                if (pickedFile == null)
-                  Center(
-                    child: BaseTextButton(
-                      text: "Select Profile Image",
-                      onPressed: selectFile,
-                      style: TextButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(59),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                      ),
-                    ),
-                  ),
-                BaseTextField(
-                  label: "First Name",
-                  hint: "John",
-                  type: BaseTextFieldType.text,
-                  controller: firstNameController,
-                ),
-                BaseTextField(
-                  label: "Last Name",
-                  hint: "Doe",
-                  type: BaseTextFieldType.text,
-                  controller: lastNameController,
-                ),
-                BaseTextField(
-                  label: "Email",
-                  hint: "john.doe@gmail.com",
-                  type: BaseTextFieldType.text,
-                  controller: emailController,
-                ),
-                BaseTextField(
-                  label: "Password",
-                  hint: "*******",
-                  type: BaseTextFieldType.text,
-                  obscureText: true,
-                  controller: passwordController,
-                ),
-                BaseTextField(
-                  label: "Confirm Password",
-                  hint: "*******",
-                  type: BaseTextFieldType.text,
-                  obscureText: true,
-                  controller: confirmPasswordController,
-                ),
-                const SizedBox(
-                  height: 30.0,
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  child: BaseTextButton(
-                    text: 'Sign Up',
-                    onPressed: enableButton
-                        ? () {
-                            context.read<AuthBloc>().add(
-                                  SignUpUserStarted(
-                                    firstName: firstNameController.text,
-                                    lastName: lastNameController.text,
-                                    email: emailController.text,
-                                    password: passwordController.text,
-                                    confirmPassword:
-                                        confirmPasswordController.text,
-                                    profileImage: pickedFile,
-                                  ),
-                                );
-                          }
-                        : null,
-                  ),
-                ),
-                const SizedBox(
-                  height: 20.0,
-                ),
+    return BaseScaffold(
+      appBar: BaseAppBar(
+        title: Text(SignInScreen.name),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 16,
+              ),
+              if (pickedFile != null)
                 Center(
-                  child: RichText(
-                    text: TextSpan(
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      children: [
-                        const TextSpan(
-                          text: "Already have an account?",
-                        ),
-                        const WidgetSpan(
-                          alignment: PlaceholderAlignment.baseline,
-                          baseline: TextBaseline.alphabetic,
-                          child: SizedBox(width: 4),
-                        ),
-                        TextSpan(
-                          text: 'Sign in',
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Colors.blue.shade900,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              context.goNamed(SignInScreen.name);
-                            },
-                        ),
-                      ],
+                  child: InkWell(
+                    onTap: selectFile,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      radius: 80.0,
+                      backgroundImage: FileImage(File(pickedFile!.path!)),
                     ),
                   ),
                 ),
-              ],
-            ),
+              if (pickedFile == null)
+                Center(
+                  child: BaseTextButton(
+                    text: "Select Profile Image",
+                    onPressed: selectFile,
+                    style: TextButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(59),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                    ),
+                  ),
+                ),
+              BaseTextField(
+                label: "First Name",
+                hint: "John",
+                type: BaseTextFieldType.text,
+                controller: firstNameController,
+              ),
+              BaseTextField(
+                label: "Last Name",
+                hint: "Doe",
+                type: BaseTextFieldType.text,
+                controller: lastNameController,
+              ),
+              BaseTextField(
+                label: "Email",
+                hint: "john.doe@gmail.com",
+                type: BaseTextFieldType.text,
+                controller: emailController,
+              ),
+              BaseTextField(
+                label: "Password",
+                hint: "*******",
+                type: BaseTextFieldType.text,
+                obscureText: true,
+                controller: passwordController,
+              ),
+              BaseTextField(
+                label: "Confirm Password",
+                hint: "*******",
+                type: BaseTextFieldType.text,
+                obscureText: true,
+                controller: confirmPasswordController,
+              ),
+              const SizedBox(
+                height: 30.0,
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: BaseTextButton(
+                  text: 'Sign Up',
+                  onPressed: enableButton
+                      ? () {
+                          context.read<AuthBloc>().add(
+                                SignUpUserStarted(
+                                  firstName: firstNameController.text,
+                                  lastName: lastNameController.text,
+                                  email: emailController.text,
+                                  password: passwordController.text,
+                                  confirmPassword:
+                                      confirmPasswordController.text,
+                                  profileImage: pickedFile,
+                                ),
+                              );
+                        }
+                      : null,
+                ),
+              ),
+              const SizedBox(
+                height: 20.0,
+              ),
+              Center(
+                child: RichText(
+                  text: TextSpan(
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    children: [
+                      const TextSpan(
+                        text: "Already have an account?",
+                      ),
+                      const WidgetSpan(
+                        alignment: PlaceholderAlignment.baseline,
+                        baseline: TextBaseline.alphabetic,
+                        child: SizedBox(width: 4),
+                      ),
+                      TextSpan(
+                        text: 'Sign in',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.blue.shade900,
+                              fontWeight: FontWeight.bold,
+                            ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            context.goNamed(SignInScreen.name);
+                          },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

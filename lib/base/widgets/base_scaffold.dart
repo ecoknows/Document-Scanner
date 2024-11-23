@@ -14,7 +14,7 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class BaseScaffold extends StatelessWidget {
   final Widget body;
-  final FloatingActionButton? floatingActionButton;
+  final Widget? floatingActionButton;
   final Widget? bottomNavigationBar;
   final PreferredSizeWidget? appBar;
   FloatingActionButtonLocation? floatingActionButtonLocation;

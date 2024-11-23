@@ -17,19 +17,25 @@ class PdfModelAdapter extends TypeAdapter<PdfModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PdfModel(
-      bytes: fields[1] as Uint8List,
+      name: fields[1] as String,
       isUploaded: fields[2] as bool,
+      imageBytes: fields[3] as Uint8List,
+      bytes: fields[4] as Uint8List,
     );
   }
 
   @override
   void write(BinaryWriter writer, PdfModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(4)
       ..writeByte(1)
-      ..write(obj.bytes)
+      ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.isUploaded);
+      ..write(obj.isUploaded)
+      ..writeByte(3)
+      ..write(obj.imageBytes)
+      ..writeByte(4)
+      ..write(obj.bytes);
   }
 
   @override

@@ -14,9 +14,11 @@ final class GetFolderImagesInProgress extends GetFolderImagesState {
 
 final class GetFolderImagesSuccess extends GetFolderImagesState {
   final List<String> images;
+  final List<String> imagesFilename;
 
   GetFolderImagesSuccess({
     required this.images,
+    required this.imagesFilename,
   });
 
   @override

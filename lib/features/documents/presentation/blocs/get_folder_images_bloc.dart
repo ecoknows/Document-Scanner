@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:document_scanner/common/classes/get_scanned_document.dart';
 import 'package:document_scanner/features/auth/core/services/firebase_auth_services.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,6 +26,7 @@ class GetFolderImagesBloc
 
     User? user = _auth.auth.currentUser;
     final List<String> images = [];
+    final List<String> imagesFilename = [];
 
     if (user != null) {
       final String folderUserPath =
@@ -40,11 +42,18 @@ class GetFolderImagesBloc
         for (Reference imageRef in imageResult.items) {
           final imageUrl = await imageRef.getDownloadURL();
           images.add(imageUrl);
+          imagesFilename.add(imageRef.name);
         }
       }
     }
 
     EasyLoading.dismiss();
-    emit(GetFolderImagesSuccess(images: images));
+
+    emit(
+      GetFolderImagesSuccess(
+        images: images,
+        imagesFilename: imagesFilename,
+      ),
+    );
   }
 }

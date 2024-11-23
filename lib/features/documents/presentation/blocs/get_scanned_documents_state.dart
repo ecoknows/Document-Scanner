@@ -16,12 +16,14 @@ final class GetScannedDocumentsSuccess extends GetScannedDocumentsState {
   final List<GetScannedDocument> documents;
   final List<ImageFolder> imageFolders;
   final List<String> images;
+  final List<String> imagesFilename;
   final List<String> pdfs;
 
   GetScannedDocumentsSuccess({
     required this.imageFolders,
     required this.documents,
     required this.images,
+    required this.imagesFilename,
     required this.pdfs,
   });
 

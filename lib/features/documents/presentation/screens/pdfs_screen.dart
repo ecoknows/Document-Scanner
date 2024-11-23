@@ -5,6 +5,7 @@ import 'package:document_scanner/common/classes/save_image_class.dart';
 import 'package:document_scanner/common/widgets/authenticated_appbar.dart';
 import 'package:document_scanner/features/documents/data/entities/document_model.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/pdf_preview_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/screens/pdf_preview_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -44,24 +45,26 @@ class _DocumentsScreenState extends State<PdfsScreen> {
                 getScannedDocumentsState.documents;
 
             if (documents.isEmpty) {
-              return Column(
-                children: [
-                  const SizedBox(
-                    height: 100.0,
-                  ),
-                  const Icon(
-                    Icons.document_scanner,
-                    color: Colors.black,
-                    size: 100.0,
-                  ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  Text(
-                    "No documents found",
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
+              return Center(
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 100.0,
+                    ),
+                    const Icon(
+                      Icons.image,
+                      color: Colors.black,
+                      size: 100.0,
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    Text(
+                      "No pdf found",
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
+                ),
               );
             }
 
@@ -74,13 +77,11 @@ class _DocumentsScreenState extends State<PdfsScreen> {
                 for (final document in documents)
                   InkWell(
                     onTap: () {
+                      context.read<PdfPreviewBloc>().add(
+                            PdfPreviewStarted(document: document),
+                          );
                       context.pushNamed(
                         PdfPreviewScreen.name,
-                        pathParameters: {
-                          "pdfName": document.name,
-                          "pdfPath": "null",
-                          "isOffline": "no",
-                        },
                       );
                     },
                     child: Stack(
@@ -112,24 +113,26 @@ class _DocumentsScreenState extends State<PdfsScreen> {
                 getScannedDocumentsState.documents;
 
             if (documents.isEmpty) {
-              return Column(
-                children: [
-                  const SizedBox(
-                    height: 100.0,
-                  ),
-                  const Icon(
-                    Icons.document_scanner,
-                    color: Colors.black,
-                    size: 100.0,
-                  ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  Text(
-                    "No documents found",
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
+              return Center(
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 100.0,
+                    ),
+                    const Icon(
+                      Icons.picture_as_pdf,
+                      color: Colors.black,
+                      size: 100.0,
+                    ),
+                    const SizedBox(
+                      height: 16.0,
+                    ),
+                    Text(
+                      "No pdf found",
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
+                ),
               );
             }
 
@@ -142,14 +145,11 @@ class _DocumentsScreenState extends State<PdfsScreen> {
                 for (GetScannedDocumentOffline document in documents)
                   InkWell(
                     onTap: () {
-                      print(document.pdf.path);
+                      context.read<PdfPreviewBloc>().add(
+                            PdfPreviewOfflineStarted(document: document),
+                          );
                       context.pushNamed(
                         PdfPreviewScreen.name,
-                        pathParameters: {
-                          "pdfName": document.name,
-                          "pdfPath": document.pdf.path,
-                          "isOffline": "yes",
-                        },
                       );
                     },
                     child: Stack(

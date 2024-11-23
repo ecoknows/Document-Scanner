@@ -17,19 +17,22 @@ class ImageModelAdapter extends TypeAdapter<ImageModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return ImageModel(
-      bytes: fields[1] as Uint8List,
+      name: fields[1] as String,
       isUploaded: fields[2] as bool,
+      bytes: fields[3] as Uint8List,
     );
   }
 
   @override
   void write(BinaryWriter writer, ImageModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(1)
-      ..write(obj.bytes)
+      ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.isUploaded);
+      ..write(obj.isUploaded)
+      ..writeByte(3)
+      ..write(obj.bytes);
   }
 
   @override

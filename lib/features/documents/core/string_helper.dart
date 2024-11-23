@@ -15,7 +15,7 @@ class StringHelper {
     }
   }
 
-  static String getFileName(String string) {
+  static String getFileFullName(String string) {
     if (isUrl(string)) {
       // Parse the URL
       Uri uri = Uri.parse(string);
@@ -25,11 +25,17 @@ class StringHelper {
 
       // The last segment will be the file name
       String fileName = pathSegments.isNotEmpty ? pathSegments.last : '';
-      return extractFileName(fileName);
+      return fileName;
     } else {
       String fileName = string.split('/').last;
 
-      return extractFileName(fileName);
+      return fileName;
     }
+  }
+
+  static String getFileName(String string) {
+    String fileName = string.split('/').last;
+
+    return extractFileName(fileName);
   }
 }

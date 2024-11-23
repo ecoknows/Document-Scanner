@@ -46,6 +46,8 @@ class _AppState extends State<App> {
                     AddScannedDocumentsStarted(
                       documents: uploadScannedDocumentsState.documents,
                       images: uploadScannedDocumentsState.images,
+                      imagesFilename:
+                          uploadScannedDocumentsState.imagesFilename,
                       pdfs: uploadScannedDocumentsState.pdfs,
                     ),
                   );
@@ -67,13 +69,12 @@ class _AppState extends State<App> {
                 context
                     .read<UploadDocumentToCloudBloc>()
                     .add(UploadDocumentToCloudStarted());
-                context
-                    .read<GetScannedDocumentsBloc>()
-                    .add(GetScannedDocumentsStarted());
+                context.read<GetScannedDocumentsBloc>().add(
+                    GetScannedDocumentsStarted(showLoadingIndicator: false));
               } else {
-                context
-                    .read<GetScannedDocumentsBloc>()
-                    .add(GetScannedDocumentsOfflineStarted());
+                context.read<GetScannedDocumentsBloc>().add(
+                    GetScannedDocumentsOfflineStarted(
+                        showLoadingIndicator: false));
               }
             }
           },
@@ -83,7 +84,7 @@ class _AppState extends State<App> {
             if (uploadToCloudState is UploadDocumentToCloudSuccess) {
               context
                   .read<GetScannedDocumentsBloc>()
-                  .add(GetScannedDocumentsStarted());
+                  .add(GetScannedDocumentsStarted(showLoadingIndicator: true));
             }
           },
         ),
@@ -175,15 +176,11 @@ class _AppState extends State<App> {
                   },
                 ),
                 GoRoute(
-                  path: '/pdf-preview/:pdfName/:pdfPath/:isOffline',
+                  path: '/pdf-preview',
                   name: PdfPreviewScreen.name,
                   pageBuilder: (BuildContext context, GoRouterState state) {
-                    return NoTransitionPage(
-                      child: PdfPreviewScreen(
-                        pdfName: state.pathParameters['pdfName'] as String,
-                        pdfPath: state.pathParameters['pdfPath'] as String,
-                        isOffline: state.pathParameters['isOffline'] as String,
-                      ),
+                    return const NoTransitionPage(
+                      child: PdfPreviewScreen(),
                     );
                   },
                 ),
