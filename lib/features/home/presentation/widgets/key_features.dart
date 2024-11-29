@@ -59,7 +59,7 @@ class KeyFeatures extends StatelessWidget {
                 width: 4.0,
               ),
               Text(
-                "Convert image to pfd",
+                "Convert image to pdf",
                 style: Theme.of(context).textTheme.labelSmall,
                 textAlign: TextAlign.center,
               ),
