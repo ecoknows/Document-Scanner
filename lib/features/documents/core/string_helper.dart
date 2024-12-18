@@ -38,4 +38,15 @@ class StringHelper {
 
     return extractFileName(fileName);
   }
+
+  static String getDocumentName(String url) {
+    // Regular expression to match the dynamic part of the URL
+    RegExp regExp = RegExp(r'%2F(\d+)%2F\1');
+
+    // Match the URL with the RegExp
+    Match? match = regExp.firstMatch(url);
+
+    // Return the matched value if found, otherwise return an empty string
+    return match != null ? match.group(1)! : '';
+  }
 }

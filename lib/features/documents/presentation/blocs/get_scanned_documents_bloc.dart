@@ -120,11 +120,9 @@ class GetScannedDocumentsBloc
         ListResult imageResult = await documentRef.listAll();
 
         for (Reference imageRef in imageResult.items) {
-          if (!imageRef.name.contains("moved")) {
-            final imageUrl = await imageRef.getDownloadURL();
-            images.add(imageUrl);
-            imagesFilename.add(imageRef.name);
-          }
+          final imageUrl = await imageRef.getDownloadURL();
+          images.add(imageUrl);
+          imagesFilename.add(imageRef.name);
         }
       }
 

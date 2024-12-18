@@ -28,7 +28,13 @@ final class GetScannedDocumentsSuccess extends GetScannedDocumentsState {
   });
 
   @override
-  List<Object?> get props => [documents, images, pdfs];
+  List<Object?> get props => [
+        imageFolders,
+        documents,
+        images,
+        imagesFilename,
+        pdfs,
+      ];
 }
 
 final class GetScannedDocumentsOfflineSuccess extends GetScannedDocumentsState {

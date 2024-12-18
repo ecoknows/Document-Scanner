@@ -87,7 +87,10 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                 listener: (context, state) {
                   if (state is CreateImageFolderSuccess) {
                     context.read<GetScannedDocumentsBloc>().add(
-                        GetScannedDocumentsStarted(showLoadingIndicator: true));
+                          GetScannedDocumentsStarted(
+                            showLoadingIndicator: true,
+                          ),
+                        );
                   }
                 },
               ),
@@ -157,6 +160,7 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                                       folder: folder,
                                       documents: documents,
                                       images: selectedImages,
+                                      imagesFilename: selectedImagesFilename,
                                     ),
                                   );
                               setState(() {

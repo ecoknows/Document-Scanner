@@ -125,37 +125,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       : null,
                 ),
               ),
-              const SizedBox(
-                height: 20.0,
-              ),
-              Center(
-                child: RichText(
-                  text: TextSpan(
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    children: [
-                      const TextSpan(
-                        text: "Don't have an account?",
-                      ),
-                      const WidgetSpan(
-                        alignment: PlaceholderAlignment.baseline,
-                        baseline: TextBaseline.alphabetic,
-                        child: SizedBox(width: 4),
-                      ),
-                      TextSpan(
-                        text: 'Sign up',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.blue.shade900,
-                              fontWeight: FontWeight.bold,
-                            ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            context.pushNamed(SignUpScreen.name);
-                          },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              // Forgot password here
             ],
           ),
         ),
