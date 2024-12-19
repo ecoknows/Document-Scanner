@@ -94,8 +94,6 @@ class UploadScannedDocumentsBloc
     await box.add(document);
 
     emit(UploadScannedDocumentsOfflineSuccess(document: document));
-
-    // pdf = pdfDocument/
   }
 
   void _uploadScannedDocuments(
@@ -108,139 +106,61 @@ class UploadScannedDocumentsBloc
     final storageRef = FirebaseStorage.instance.ref();
 
     if (user != null) {
-      final String documentName =
-          DateTime.now().microsecondsSinceEpoch.toString();
+      final String documentName = event.documentName;
 
       final String imageUserPath =
           "images/scanned_documents/${user.uid}/$documentName";
 
-      final List<GetScannedDocument> documents = [];
       final List<String> images = [];
       final List<String> imagesFilename = [];
-      final List<String> pdfs = [];
 
-      PdfDocument pdfDocument = PdfDocument();
+      emit(UploadScannedDocumentsInProgress());
 
-      for (var (index, picture) in pictures.indexed) {
-        final File image = File(picture);
-        UploadTask? uploadImagesTask;
+      // Use Future.wait for parallel uploads
+      try {
+        final List<Future<void>> uploadTasks =
+            pictures.asMap().entries.map((entry) async {
+          int index = entry.key;
+          String picture = entry.value;
 
-        final String imageName = "$documentName.$index.jpg";
-        imagesFilename.add(imageName);
+          final File image = File(picture);
 
-        final String imagePath = "$imageUserPath/$imageName";
+          final String imageName = "$documentName.$index.jpg";
+          imagesFilename.add(imageName);
 
-        final imageStorage = storageRef.child(imagePath);
+          final String imagePath = "$imageUserPath/$imageName";
+          final imageStorage = storageRef.child(imagePath);
 
-        uploadImagesTask = imageStorage.putFile(image);
+          UploadTask uploadTask = imageStorage.putFile(image);
 
-        uploadImagesTask.snapshotEvents.listen((event) {
-          double progress =
-              event.bytesTransferred.toDouble() / event.totalBytes.toDouble();
-          EasyLoading.showProgress(progress,
-              status: '${(progress * 100).round()}%');
-        }).onError((error) {
-          throw Exception('Something went wrong uploading image.');
-        });
+          // Track progress for each upload
+          uploadTask.snapshotEvents.listen((event) {
+            double progress =
+                event.bytesTransferred.toDouble() / event.totalBytes.toDouble();
+            EasyLoading.showProgress(progress,
+                status: 'Uploading $index: ${(progress * 100).round()}%');
+          }).onError((error) {
+            throw Exception('Something went wrong uploading image $index.');
+          });
 
-        TaskSnapshot imageSnapshot =
-            await uploadImagesTask.whenComplete(() async {
-          EasyLoading.dismiss();
-        });
+          TaskSnapshot snapshot = await uploadTask;
+          var downloadUrl = await snapshot.ref.getDownloadURL();
+          images.add(downloadUrl);
+        }).toList();
 
-        var imageDownloadUrl = await imageSnapshot.ref.getDownloadURL();
-        images.add(imageDownloadUrl);
+        await Future.wait(uploadTasks);
 
-        PdfPage page = pdfDocument.pages.add();
-
-        final PdfImage pdfImage = PdfBitmap(image.readAsBytesSync());
-
-        page.graphics.drawImage(
-          pdfImage,
-          Rect.fromLTWH(
-            0,
-            0,
-            page.size.width,
-            page.size.height,
-          ),
-        );
-      }
-
-      // PDF Image Process
-      UploadTask? uploadPdfImagesTask;
-      final String pdfImageUserPath = "pdf/scanned_image/${user.uid}";
-      final String pdfImagePath = "$pdfImageUserPath/$documentName.jpg";
-      final pdfImageRef = storageRef.child(pdfImagePath);
-
-      String pdfImageFilePath = pictures.first;
-      final File pdfImage = File(pdfImageFilePath);
-      uploadPdfImagesTask = pdfImageRef.putFile(pdfImage);
-
-      uploadPdfImagesTask.snapshotEvents.listen((event) {
-        double progress =
-            event.bytesTransferred.toDouble() / event.totalBytes.toDouble();
-        EasyLoading.showProgress(progress,
-            status: '${(progress * 100).round()}%');
-      }).onError((error) {
-        throw Exception('Something went wrong uploading image.');
-      });
-
-      TaskSnapshot imagePdfSnapshot =
-          await uploadPdfImagesTask.whenComplete(() async {
-        EasyLoading.dismiss();
-      });
-
-      var imagePdfDownloadUrl = await imagePdfSnapshot.ref.getDownloadURL();
-
-      // PDF Process
-      final String pdfUserPath = "pdf/scanned_documents/${user.uid}";
-      final String pdfPath = "$pdfUserPath/$documentName.pdf";
-      final pdfRef = storageRef.child(pdfPath);
-      UploadTask? pdfUploadTask;
-
-      List<int> bytes = await pdfDocument.save();
-
-      final File pdfFile =
-          await SaveFile.bytesToFile(bytes, "$documentName.pdf");
-
-      pdfUploadTask = pdfRef.putFile(pdfFile);
-
-      pdfUploadTask.snapshotEvents.listen((event) {
-        double progress =
-            event.bytesTransferred.toDouble() / event.totalBytes.toDouble();
-        EasyLoading.showProgress(progress,
-            status: '${(progress * 100).round()}%');
-      }).onError((error) {
-        throw Exception('Something went wrong uploading pdf.');
-      });
-
-      TaskSnapshot pdfSnapshot = await pdfUploadTask.whenComplete(() {
-        EasyLoading.dismiss();
-      });
-
-      var pdfDownloadUrl = await pdfSnapshot.ref.getDownloadURL();
-      pdfs.add(pdfDownloadUrl);
-
-      pdfDocument.dispose();
-
-      documents.add(GetScannedDocument(
-        name: documentName,
-        image: imagePdfDownloadUrl,
-        pdf: pdfDownloadUrl,
-      ));
-
-      emit(
-        UploadScannedDocumentsSuccess(
-          documents: documents,
+        emit(UploadScannedDocumentsSuccess(
           images: images,
           imagesFilename: imagesFilename,
-          pdfs: pdfs,
-        ),
-      );
+        ));
+      } catch (e) {
+        emit(UploadScannedDocumentsFail(message: "Error uploading images: $e"));
+      } finally {
+        EasyLoading.dismiss();
+      }
     } else {
       emit(UploadScannedDocumentsFail(message: "User not found."));
     }
-
-    emit(UploadScannedDocumentsInProgress());
   }
 }

@@ -3,6 +3,7 @@ import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:document_scanner/common/bloc/connectivity_bloc.dart';
 import 'package:document_scanner/common/classes/save_image_class.dart';
 import 'package:document_scanner/common/widgets/authenticated_appbar.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/upload_pdf_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/screens/images_screen.dart';
 import 'package:document_scanner/features/home/presentation/screens/home_screen.dart';
@@ -101,8 +102,20 @@ class _BaseScaffoldDocumentScannerState
 
               if (connectivityState is ConnectivitySuccess) {
                 if (connectivityState.isConnectedToInternet) {
+                  final String documentName =
+                      DateTime.now().microsecondsSinceEpoch.toString();
                   context.read<UploadScannedDocumentsBloc>().add(
-                        UploadScannedDocumentsStarted(pictures: pictures),
+                        UploadScannedDocumentsStarted(
+                          pictures: pictures,
+                          documentName: documentName,
+                        ),
+                      );
+
+                  context.read<UploadPdfBloc>().add(
+                        UploadPdfStarted(
+                          pictures: pictures,
+                          documentName: documentName,
+                        ),
                       );
                 } else if (connectivityState.isConnectedToInternet == false) {
                   context.read<UploadScannedDocumentsBloc>().add(

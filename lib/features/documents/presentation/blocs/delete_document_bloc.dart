@@ -15,14 +15,14 @@ class DeleteDocumentBloc
   final FirebaseAuthService _auth = FirebaseAuthService();
 
   DeleteDocumentBloc() : super(DeleteDocumentInitial()) {
-    on<DeleteImageStarted>(_deleteImageStarted);
+    on<DeleteImagesStarted>(_deleteImagesStarted);
     on<DeleteImageOfflineStarted>(_deleteImageOfflineStarted);
     on<DeletePdfOfflineStarted>(_deletePdfOfflineStarted);
     on<DeletePdfStarted>(_deletePdfStarted);
   }
 
-  Future<void> _deleteImageStarted(
-    DeleteImageStarted event,
+  Future<void> _deleteImagesStarted(
+    DeleteImagesStarted event,
     Emitter<DeleteDocumentState> emit,
   ) async {
     emit(DeleteDocumentInProgress());
@@ -31,16 +31,26 @@ class DeleteDocumentBloc
     final storageRef = FirebaseStorage.instance.ref();
 
     if (user != null) {
-      EasyLoading.show();
+      for (var (index, fileName) in event.fileNames.indexed) {
+        EasyLoading.showProgress(
+          index / event.fileNames.length,
+          status: "Deleting $index of ${event.fileNames.length}",
+        );
+        String folderName = StringHelper.extractFileName(fileName);
+        String imageUserPath = "";
 
-      String folderName = StringHelper.extractFileName(event.fileName);
+        if (event.path.isNotEmpty) {
+          imageUserPath =
+              "images/folders/${user.uid}/${event.path}/$folderName/$fileName";
+        } else {
+          imageUserPath =
+              "images/scanned_documents/${user.uid}/$folderName/$fileName";
+        }
 
-      final String imageUserPath =
-          "images/scanned_documents/${user.uid}/$folderName/${event.fileName}";
+        final imageStorage = storageRef.child(imageUserPath);
 
-      final imageStorage = storageRef.child(imageUserPath);
-
-      await imageStorage.delete();
+        await imageStorage.delete();
+      }
 
       EasyLoading.dismiss();
     }

@@ -428,8 +428,8 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
               child: const Text('Yes'),
               onPressed: () {
                 context.read<DeleteDocumentBloc>().add(
-                      DeleteImageStarted(
-                        fileName: fileName,
+                      DeleteImagesStarted(
+                        fileNames: [fileName],
                       ),
                     );
 

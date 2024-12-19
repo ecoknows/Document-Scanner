@@ -20,20 +20,19 @@ final class GetScannedDocumentsOfflineStarted extends GetScannedDocumentsEvent {
 }
 
 final class AddScannedDocumentsStarted extends GetScannedDocumentsEvent {
-  final List<GetScannedDocument> documents;
   final List<String> images;
   final List<String> imagesFilename;
-  final List<String> pdfs;
 
   AddScannedDocumentsStarted({
-    required this.documents,
     required this.images,
     required this.imagesFilename,
-    required this.pdfs,
   });
 
   @override
-  List<Object?> get props => [documents, images, imagesFilename, pdfs];
+  List<Object?> get props => [
+        images,
+        imagesFilename,
+      ];
 }
 
 final class RemoveImagesStarted extends GetScannedDocumentsEvent {

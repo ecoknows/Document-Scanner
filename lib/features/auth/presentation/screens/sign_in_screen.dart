@@ -5,6 +5,7 @@ import 'package:document_scanner/base/widgets/base_text_button.dart';
 import 'package:document_scanner/base/widgets/base_textfield.dart';
 import 'package:document_scanner/features/auth/core/exceptions/auth_execptions.dart';
 import 'package:document_scanner/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:document_scanner/features/auth/presentation/screens/forget_password_screen.dart';
 import 'package:document_scanner/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_document_to_cloud_bloc.dart';
@@ -125,7 +126,30 @@ class _SignInScreenState extends State<SignInScreen> {
                       : null,
                 ),
               ),
-              // Forgot password here
+              const SizedBox(
+                height: 20.0,
+              ),
+              Center(
+                child: RichText(
+                  text: TextSpan(
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    children: [
+                      TextSpan(
+                        text: 'Forget Password?',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.blue.shade900,
+                              fontWeight: FontWeight.bold,
+                            ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            // context.pushNamed(SignUpScreen.name);
+                            context.pushNamed(ForgotPasswordScreen.name);
+                          },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),

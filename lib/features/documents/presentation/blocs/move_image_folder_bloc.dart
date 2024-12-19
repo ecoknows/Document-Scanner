@@ -1,6 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:document_scanner/common/classes/firebase_helpers.dart';
-import 'package:document_scanner/common/classes/get_scanned_document.dart';
 import 'package:document_scanner/features/auth/core/services/firebase_auth_services.dart';
 import 'package:document_scanner/features/documents/core/image_folder.dart';
 import 'package:document_scanner/features/documents/core/string_helper.dart';
@@ -28,8 +26,6 @@ class MoveImageFolderBloc
 
     emit(MoveImageFolderInProgress());
 
-    EasyLoading.show();
-
     if (user != null) {
       for (var (index, image) in event.images.indexed) {
         String documentName = StringHelper.getDocumentName(image);
@@ -44,13 +40,12 @@ class MoveImageFolderBloc
             "images/folders/${user.uid}/${event.folder.id}/$documentName/$fileName");
 
         if (data != null) {
-          await newFileRef.putData(data);
-          await fileRef.delete();
+          newFileRef.putData(data);
+          fileRef.delete();
         }
       }
     }
 
-    EasyLoading.dismiss();
     emit(MoveImageFolderSuccess());
   }
 }

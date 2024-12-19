@@ -4,11 +4,15 @@ sealed class UploadScannedDocumentsEvent extends Equatable {}
 
 final class UploadScannedDocumentsStarted extends UploadScannedDocumentsEvent {
   final List<String> pictures;
+  final String documentName;
 
-  UploadScannedDocumentsStarted({required this.pictures});
+  UploadScannedDocumentsStarted({
+    required this.pictures,
+    required this.documentName,
+  });
 
   @override
-  List<Object?> get props => [pictures];
+  List<Object?> get props => [pictures, documentName];
 }
 
 final class UploadScannedDocumentsOfflineStarted

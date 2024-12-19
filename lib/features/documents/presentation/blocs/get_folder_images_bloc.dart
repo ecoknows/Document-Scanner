@@ -21,7 +21,6 @@ class GetFolderImagesBloc
     GetFolderImageStarted event,
     Emitter<GetFolderImagesState> emit,
   ) async {
-    emit(GetFolderImagesInProgress());
     EasyLoading.show();
 
     User? user = _auth.auth.currentUser;

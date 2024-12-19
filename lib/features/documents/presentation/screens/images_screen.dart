@@ -10,6 +10,7 @@ import 'package:document_scanner/features/auth/core/services/firebase_auth_servi
 import 'package:document_scanner/features/documents/data/entities/document_model.dart';
 import 'package:document_scanner/features/documents/core/image_folder.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/create_image_folder_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/delete_document_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/image_preview_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/move_image_folder_bloc.dart';
@@ -53,7 +54,11 @@ class _DocumentsScreenState extends State<ImagesScreen> {
           appBar: AuthenticatedAppBar(
             title: ImagesScreen.name,
             primaryWidget: connectivityState.isConnectedToInternet
-                ? TextButton(
+                ? IconButton(
+                    icon: Icon(
+                      isSelected ? Icons.cancel : Icons.select_all,
+                    ), // Choose the desired icon
+                    tooltip: isSelected ? "Cancel" : 'Select',
                     onPressed: () {
                       setState(() {
                         selectedImages = [];
@@ -61,28 +66,60 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                         isSelected = !isSelected;
                       });
                     },
-                    child: Text(isSelected ? "Cancel" : "Move"),
                   )
                 : null,
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
           floatingActionButton: connectivityState.isConnectedToInternet
-              ? FloatingActionButton(
-                  onPressed: () async {
-                    context
-                        .read<CreateImageFolderBloc>()
-                        .add(CreateImageFolderStarted());
-                  },
-                  backgroundColor: Colors.orange,
-                  shape: const CircleBorder(),
-                  child: const Icon(
-                    Icons.drive_folder_upload_sharp,
-                    color: Colors.black,
-                  ),
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    if (isSelected && selectedImages.isNotEmpty) ...[
+                      FloatingActionButton(
+                        onPressed: () {
+                          _showDeleteDialog();
+                        },
+                        backgroundColor: Colors.orange,
+                        shape: const CircleBorder(),
+                        child: const Icon(
+                          Icons.delete,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                    ],
+                    FloatingActionButton(
+                      onPressed: () async {
+                        context
+                            .read<CreateImageFolderBloc>()
+                            .add(CreateImageFolderStarted());
+                      },
+                      backgroundColor: Colors.orange,
+                      shape: const CircleBorder(),
+                      child: const Icon(
+                        Icons.drive_folder_upload_sharp,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
                 )
               : null,
           body: MultiBlocListener(
             listeners: [
+              BlocListener<DeleteDocumentBloc, DeleteDocumentState>(
+                listener: (context, state) {
+                  if (state is DeleteDocumentSuccess) {
+                    context.read<GetScannedDocumentsBloc>().add(
+                          GetScannedDocumentsStarted(
+                            showLoadingIndicator: true,
+                          ),
+                        );
+                  }
+                },
+              ),
               BlocListener<CreateImageFolderBloc, CreateImageFolderState>(
                 listener: (context, state) {
                   if (state is CreateImageFolderSuccess) {
@@ -98,7 +135,10 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                 listener: (context, state) {
                   if (state is MoveImageFolderSuccess) {
                     context.read<GetScannedDocumentsBloc>().add(
-                        GetScannedDocumentsStarted(showLoadingIndicator: true));
+                          GetScannedDocumentsStarted(
+                            showLoadingIndicator: false,
+                          ),
+                        );
                   }
                 },
               ),
@@ -107,8 +147,6 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                 BlocBuilder<GetScannedDocumentsBloc, GetScannedDocumentsState>(
               builder: (context, getScannedDocumentsState) {
                 if (getScannedDocumentsState is GetScannedDocumentsSuccess) {
-                  List<GetScannedDocument> documents =
-                      getScannedDocumentsState.documents;
                   List<String> images = getScannedDocumentsState.images;
                   List<String> imagesFilename =
                       getScannedDocumentsState.imagesFilename;
@@ -158,7 +196,6 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                               context.read<MoveImageFolderBloc>().add(
                                     MoveImageFolderStarted(
                                       folder: folder,
-                                      documents: documents,
                                       images: selectedImages,
                                       imagesFilename: selectedImagesFilename,
                                     ),
@@ -231,6 +268,32 @@ class _DocumentsScreenState extends State<ImagesScreen> {
                                 height: 100,
                                 width: 100,
                                 fit: BoxFit.cover,
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child; // Image loaded successfully
+                                  }
+                                  return Container(
+                                    height: 100,
+                                    width: 100,
+                                    color: Colors.grey[
+                                        200], // Placeholder background color
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.orange,
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                (loadingProgress
+                                                        .expectedTotalBytes ??
+                                                    1)
+                                            : null,
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                               if (isSelected)
                                 Positioned(
@@ -373,6 +436,43 @@ class _DocumentsScreenState extends State<ImagesScreen> {
               },
             ),
           ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showDeleteDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Deleting Image/s'),
+          content: const Text("Are you sure you want to delete item/s?"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                context.read<DeleteDocumentBloc>().add(
+                      DeleteImagesStarted(
+                        fileNames: selectedImagesFilename,
+                      ),
+                    );
+
+                setState(() {
+                  selectedImages = [];
+                  selectedImagesFilename = [];
+                  isSelected = false;
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
         );
       },
     );

@@ -14,20 +14,19 @@ final class UploadScannedDocumentsInProgress
 }
 
 final class UploadScannedDocumentsSuccess extends UploadScannedDocumentsState {
-  final List<GetScannedDocument> documents;
   final List<String> images;
   final List<String> imagesFilename;
-  final List<String> pdfs;
 
   UploadScannedDocumentsSuccess({
-    required this.documents,
     required this.images,
     required this.imagesFilename,
-    required this.pdfs,
   });
 
   @override
-  List<Object?> get props => [documents, images, pdfs];
+  List<Object?> get props => [
+        images,
+        imagesFilename,
+      ];
 }
 
 final class UploadScannedDocumentsOfflineSuccess

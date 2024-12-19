@@ -15,6 +15,7 @@ import 'package:document_scanner/features/documents/presentation/blocs/move_imag
 import 'package:document_scanner/features/documents/presentation/blocs/pdf_preview_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/rename_folder_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_document_to_cloud_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/upload_pdf_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_scanned_documents_bloc.dart';
 import 'package:document_scanner/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -58,6 +59,7 @@ class Main extends StatelessWidget {
         BlocProvider(create: (_) => UploadDocumentToCloudBloc()),
         BlocProvider(create: (_) => DeleteDocumentBloc()),
         BlocProvider(create: (_) => PdfPreviewBloc()),
+        BlocProvider(create: (_) => UploadPdfBloc()),
       ],
       child: const App(),
     );

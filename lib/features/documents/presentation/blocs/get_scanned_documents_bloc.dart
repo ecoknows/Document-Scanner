@@ -154,7 +154,6 @@ class GetScannedDocumentsBloc
         documents: documents,
         images: images,
         imagesFilename: imagesFilename,
-        pdfs: pdfs,
       ));
     } else {
       emit(GetScannedDocumentsFail(message: "User not found."));
@@ -173,22 +172,17 @@ class GetScannedDocumentsBloc
 
     if (currentState is GetScannedDocumentsSuccess) {
       List<ImageFolder> imageFolders = List.from(currentState.imageFolders);
-      List<GetScannedDocument> documents = List.from(currentState.documents);
       List<String> images = List.from(currentState.images);
       List<String> imagesFilename = List.from(currentState.imagesFilename);
-      List<String> pdfs = List.from(currentState.pdfs);
 
-      documents.addAll(event.documents);
       images.addAll(event.images);
       imagesFilename.addAll(event.imagesFilename);
-      pdfs.addAll(event.pdfs);
 
       emit(GetScannedDocumentsSuccess(
         imageFolders: imageFolders,
-        documents: documents,
+        documents: currentState.documents,
         images: images,
         imagesFilename: imagesFilename,
-        pdfs: pdfs,
       ));
     }
   }
@@ -212,7 +206,6 @@ class GetScannedDocumentsBloc
         documents: currentState.documents,
         images: images,
         imagesFilename: imagesFilename,
-        pdfs: currentState.pdfs,
       ));
     }
   }

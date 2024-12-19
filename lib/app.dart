@@ -1,10 +1,12 @@
 import 'package:document_scanner/base/themes/base_theme_data.dart';
 import 'package:document_scanner/base/widgets/base_scaffold.dart';
 import 'package:document_scanner/common/bloc/connectivity_bloc.dart';
+import 'package:document_scanner/features/auth/presentation/screens/forget_password_screen.dart';
 import 'package:document_scanner/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:document_scanner/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_document_to_cloud_bloc.dart';
+import 'package:document_scanner/features/documents/presentation/blocs/upload_pdf_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/upload_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/screens/folder_screen.dart';
 import 'package:document_scanner/features/documents/presentation/screens/images_screen.dart';
@@ -39,16 +41,25 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
+        BlocListener<UploadPdfBloc, UploadPdfState>(
+          listener: (_, uploadPdfState) {
+            if (uploadPdfState is UploadPdfSuccess) {
+              context.read<GetScannedDocumentsBloc>().add(
+                    GetScannedDocumentsStarted(
+                      showLoadingIndicator: false,
+                    ),
+                  );
+            }
+          },
+        ),
         BlocListener<UploadScannedDocumentsBloc, UploadScannedDocumentsState>(
           listener: (_, uploadScannedDocumentsState) {
             if (uploadScannedDocumentsState is UploadScannedDocumentsSuccess) {
               context.read<GetScannedDocumentsBloc>().add(
                     AddScannedDocumentsStarted(
-                      documents: uploadScannedDocumentsState.documents,
                       images: uploadScannedDocumentsState.images,
                       imagesFilename:
                           uploadScannedDocumentsState.imagesFilename,
-                      pdfs: uploadScannedDocumentsState.pdfs,
                     ),
                   );
             }
@@ -73,8 +84,10 @@ class _AppState extends State<App> {
                     GetScannedDocumentsStarted(showLoadingIndicator: false));
               } else {
                 context.read<GetScannedDocumentsBloc>().add(
-                    GetScannedDocumentsOfflineStarted(
-                        showLoadingIndicator: false));
+                      GetScannedDocumentsOfflineStarted(
+                        showLoadingIndicator: false,
+                      ),
+                    );
               }
             }
           },
@@ -209,6 +222,14 @@ class _AppState extends State<App> {
                   name: SignUpScreen.name,
                   pageBuilder: (BuildContext context, GoRouterState state) {
                     return const NoTransitionPage(child: SignUpScreen());
+                  },
+                ),
+                GoRoute(
+                  path: '/forgot-password',
+                  name: ForgotPasswordScreen.name,
+                  pageBuilder: (BuildContext context, GoRouterState state) {
+                    return const NoTransitionPage(
+                        child: ForgotPasswordScreen());
                   },
                 ),
               ],

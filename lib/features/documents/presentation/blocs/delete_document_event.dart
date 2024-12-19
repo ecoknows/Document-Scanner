@@ -2,15 +2,17 @@ part of 'delete_document_bloc.dart';
 
 sealed class DeleteDocumentEvent extends Equatable {}
 
-final class DeleteImageStarted extends DeleteDocumentEvent {
-  final String fileName;
+final class DeleteImagesStarted extends DeleteDocumentEvent {
+  final List<String> fileNames;
+  final String path;
 
-  DeleteImageStarted({
-    required this.fileName,
+  DeleteImagesStarted({
+    required this.fileNames,
+    this.path = "",
   });
 
   @override
-  List<Object> get props => [fileName];
+  List<Object> get props => [fileNames, path];
 }
 
 final class DeleteImageOfflineStarted extends DeleteDocumentEvent {
