@@ -189,24 +189,24 @@ class AuthenticatedAppBar extends StatelessWidget
                     ),
                   ),
                 ),
-                const PopupMenuDivider(),
-                const PopupMenuItem(
-                  value: "settings",
-                  height: 0,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  child: Text(
-                    'Settings',
-                    style: TextStyle(
-                      fontFamily: 'OpenSauceTwo',
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
+                // const PopupMenuDivider(),
+                // const PopupMenuItem(
+                //   value: "settings",
+                //   height: 0,
+                //   padding: EdgeInsets.symmetric(
+                //     horizontal: 16,
+                //     vertical: 8,
+                //   ),
+                //   child: Text(
+                //     'Settings',
+                //     style: TextStyle(
+                //       fontFamily: 'OpenSauceTwo',
+                //       fontWeight: FontWeight.w600,
+                //       color: Colors.black,
+                //       fontSize: 14,
+                //     ),
+                //   ),
+                // ),
                 if (currentUser != null) ...[
                   const PopupMenuDivider(),
                   const PopupMenuItem(

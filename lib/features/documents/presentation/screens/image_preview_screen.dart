@@ -14,7 +14,11 @@ import 'package:document_scanner/features/documents/presentation/blocs/delete_do
 import 'package:document_scanner/features/documents/presentation/blocs/get_scanned_documents_bloc.dart';
 import 'package:document_scanner/features/documents/presentation/blocs/image_preview_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
@@ -35,8 +39,6 @@ class ImagePreviewScreen extends StatefulWidget {
 }
 
 class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
-  void savedSuccess() {}
-
   @override
   Widget build(BuildContext context) {
     String? index = widget.index;
@@ -68,17 +70,124 @@ class _ImagePreviewScreenState extends State<ImagePreviewScreen> {
                   margin: const EdgeInsets.only(top: 20),
                   child: Column(
                     children: [
-                      Text(
-                        DateHelper.timestampToReadableDate(
-                          StringHelper.extractFileName(
-                            imagePreviewState.imagesFilename[i],
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            DateHelper.timestampToReadableDate(
+                              StringHelper.extractFileName(
+                                imagePreviewState.imagesFilename[i],
+                              ),
+                            ),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                          const SizedBox(width: 20),
+                          IconButton(
+                            icon: const Icon(Icons.copy), // The icon to display
+                            onPressed: () async {
+                              // Convert the image URL to a file
+                              File file = await ImageHelper.imageUrlToFile(
+                                  imagePreviewState.images[i], "target.jpg");
+
+                              // Initialize the text recognizer
+                              final textRecognizer = TextRecognizer();
+
+                              EasyLoading.show();
+
+                              // Process the image to get the recognized text
+                              final RecognizedText recognizedText =
+                                  await textRecognizer
+                                      .processImage(InputImage.fromFile(file));
+
+                              // Get the recognized text
+                              String text = recognizedText.text;
+                              print(text);
+
+                              // Close the text recognizer
+                              textRecognizer.close();
+                              EasyLoading.dismiss();
+
+                              if (text.isEmpty) {
+                                AnimatedSnackBar.material(
+                                  'No text found.',
+                                  type: AnimatedSnackBarType.info,
+                                  duration: const Duration(seconds: 5),
+                                  mobileSnackBarPosition:
+                                      MobileSnackBarPosition.bottom,
+                                ).show(context);
+
+                                return;
+                              }
+
+                              // Show dialog with the recognized text
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('Text Recognition'),
+                                    content: SingleChildScrollView(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // Display the recognized text
+                                          SelectableText(
+                                            text,
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                          SizedBox(height: 10),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              // Copy the recognized text to clipboard
+                                              Clipboard.setData(
+                                                      ClipboardData(text: text))
+                                                  .then((_) {
+                                                AnimatedSnackBar.material(
+                                                  'Text copied to clipboard',
+                                                  type: AnimatedSnackBarType
+                                                      .success,
+                                                  duration: const Duration(
+                                                      seconds: 5),
+                                                  mobileSnackBarPosition:
+                                                      MobileSnackBarPosition
+                                                          .bottom,
+                                                ).show(context);
+
+                                                context.pop();
+                                              });
+                                            },
+                                            child:
+                                                const Text('Copy to Clipboard'),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          // Close the dialog
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('Close'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            iconSize: 24.0, // Icon size
+                            splashRadius: 30.0, // Adjust splash size
+                            style: IconButton.styleFrom(
+                              // Optional for material 3
+                              backgroundColor: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 10),
                       Row(
